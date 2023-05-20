@@ -1,0 +1,33 @@
+        Bill    WordleBot       LizBot (arose)          Lizbot (adore)  Wordlebots Word
+acrid   4       3               3                       2               5       (least)
+aglow   4       3               3                       3               4
+anger   4       3               4
+below   4       3               4
+broke   2       5               4
+broom   3       5               3                       4
+canoe   3       4               3                       3               3       (least)   
+cedar   3       3               3
+cocoa   5       3               4                       4               6 !!
+ditto   2       3               4
+foray   4       ?               4
+ghoul   3       4               4
+grief   3       4               4                       4               6       (least)
+guppy   4       5               4
+horde   5       4               5
+hound   DNF     DNF             DNF
+joker   4       DNF             DNF
+latte   3       3               4                       4               3       (least)              
+logic   5       3               4
+metro   3       4               5
+moral   3       ?               4
+plank   3       5               4                       4               5       (least)                                              
+plate   3       2               4
+plaza   5       3               5
+range   5       3               3
+shorn   4       4               4                       4               5       (least)               
+snack   6       3               6                       6
+sulky   4       3               4
+thump   5       3               4
+unzip   5       3               6
+whiff   4       4               3                       4
+
