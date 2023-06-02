@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Wordlebot;
 
 namespace MyApp
 {
@@ -8,11 +9,12 @@ namespace MyApp
         static List<string> LettersByFrequency = new();
         static List<string> PluralsWithS = new();
         static List<string> WordsWithDoubles = new();
-        static List<char> Vowels = new List<char> { 'a', 'e', 'i', 'o', 'u' };
+        static readonly List<char> Vowels = new() { 'a', 'e', 'i', 'o', 'u' };
         static List<string> Words = new();
         
-        static private int HINT_MARKER = 1;
-        static private int MATCH_MARKER = 2;
+        private static readonly int HINT_MARKER = 1;
+        private static readonly int MATCH_MARKER = 2;
+        private static readonly int MAX_GUESSES = 6;
 
         static void Main(string[] args)
         {
@@ -40,86 +42,91 @@ namespace MyApp
 
             wordle = args[1];
             Console.WriteLine($"First word: {args[0]}");
-            Console.WriteLine($"Wordle: {wordle}");
+            Console.WriteLine($"Wordle: {wordle}\n");
 
             int attempts = 1;
             string? guess = "";
-            int[] marks = new int[5] { 0, 0, 0, 0, 0 };
-            while (attempts < 7)
+            Marks marks = new();
+            while (attempts <= MAX_GUESSES)
             {
                 if (attempts == 1)
+                {
                     guess = args[0];
+                }
                 else
                 {
-                    Console.WriteLine($"Words remaining: {Words.Count}");
-
-                    if (IsOnlyBlanks(marks))
-                    {
-                        Console.WriteLine("No hints/matches found. Look for word with most vowels.");
-
-                        // Remove the letters that don't belong (all five in this case!)
-                        Words = RemoveWordsByMark(marks, guess, Words);
-
-                        // Get a list of vowels we need to find
-                        Console.Write($"Remaining vowels: ");
-                        Vowels.ForEach(vowel => Console.Write($"{vowel} "));
-                        Console.WriteLine("");
-
-                        // Find a word with the most remaining vowels
-                        guess = FindWordWithVowels(Vowels, Words, Vowels.Count);
-                        Words.Insert(0, guess);
-                    }
-                    else if (IsOnlyHints(marks))
-                    {
-                        Console.WriteLine("Get next word based on hints");
-
-                        Words = RemoveWordsByHints(marks, guess, Words);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Get words by chopping off letters");
-
-                        Words = RemoveWordsByMark(marks, guess, Words);
-                        Console.WriteLine($"Words remaining: {Words.Count}");
-                        PrintWorldList(Words);
-                    }
-
-                    Console.WriteLine("Remove works lacking known hints");
-                    Words = RemoveWordsMissingHints(marks, guess, Words);
-                    Console.WriteLine($"Words remaining: {Words.Count}");
-                    PrintWorldList(Words);
-
-                    Words = SortListByMarks(marks, guess, Words);
-
-                    Console.WriteLine($"Found {Words.Count:#,##0} potential words");
-                    PrintWorldList(Words);
-
-                    if (Words.Count < 1)
-                    {
-                        Console.WriteLine("No words remaining.");
-                        return;
-                    }
-
                     // TODO: if more than one item, this should have some heuristic rather
                     // than picking first.
                     guess = Words[0];
                 }
-
-                if (guess == null)
-                {
-                    return;
-                }
-
-                Console.WriteLine($"Guess {attempts}: {guess.ToString()}");
+                
+                Console.WriteLine($"Guess {attempts}: {guess}");
 
                 if (guess == wordle)
                 {
                     Console.WriteLine($"You found the wordle in {attempts} tries!");
                     return;
                 }
+                else if (attempts == MAX_GUESSES)
+                {
+                    Console.WriteLine("\nYou didn't find the Wordle. Better luck tomorrow.");
+                    Console.WriteLine($"The Wordle is: {wordle}");
+                    return;
+                }
 
-                marks = ScoreWord(guess, wordle);
-                Console.WriteLine($"Marks: {string.Join(" ", marks)}");
+                Console.WriteLine($"Scoring word: {guess}");
+                marks.ScoreWord(guess, wordle);
+                marks.PrintMarks();
+
+                if (marks.IsOnlyBlanks())
+                {
+                    Console.WriteLine("No hints/matches found. Look for word with most vowels.");
+
+                    // Remove the letters that don't belong (all five in this case!)
+                    Words = RemoveWordsByMark(marks.marks, guess, Words);
+
+                    // Get a list of vowels we need to find
+                    Console.Write($"Remaining vowels: ");
+                    Vowels.ForEach(vowel => Console.Write($"{vowel} "));
+                    Console.WriteLine("");
+
+                    // Find a word with the most remaining vowels
+                    guess = FindWordWithVowels(Vowels, Words, Vowels.Count);
+                    Words.Insert(0, guess);
+                }
+                else if (marks.IsOnlyHints())
+                {
+                    Console.WriteLine("Get next word based on hints");
+
+                    Words = RemoveWordsByHints(marks.marks, guess, Words);
+                }
+                else
+                {
+                    Console.WriteLine("Get words by chopping off letters");
+
+                    Words = RemoveWordsByMark(marks.marks, guess, Words);
+                    Console.WriteLine($"Words remaining: {Words.Count}");
+                    PrintWorldList(Words);
+                }
+
+                Words = SortListByMarks(marks.marks, guess, Words);
+
+                Console.WriteLine($"Found {Words.Count:#,##0} potential words");
+                PrintWorldList(Words);
+
+
+
+                if (guess == null)
+                {
+                    return;
+                }
+                if (Words.Count < 1)
+                {
+                    Console.WriteLine("No words remaining.");
+                    return;
+                }
+
+
 
                 attempts++;
             }
@@ -175,7 +182,7 @@ namespace MyApp
             int index = 0;
 
             var hints = GetHintLetters(marks, guess);
-
+            Console.WriteLine($"Hints: {string.Join(" ", hints)}");
 
             for (int x = 0; x < 5; x++)
             {
@@ -223,33 +230,6 @@ namespace MyApp
             List<string> sortedWords = maxKeyValueList != null ? maxKeyValueList.Select(x => x.Word).ToList().Concat(list.Except(maxKeyValueList.Select(x => x.Word))).ToList() : list;
             return sortedWords;
         }
-
-        static bool IsOnlyBlanks(int[] marks)
-        {
-            foreach (int mark in marks)
-            {
-                if (mark != 0)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        static bool IsOnlyHints(int[] marks)
-        {
-            foreach (int mark in marks)
-            {
-                if (mark == 2)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
 
         static List<string> RemoveWordsMissingHints(int[] marks, string guess, List<string> list)
         {
@@ -433,64 +413,6 @@ namespace MyApp
 
             list.RemoveAll(item => deletes.Contains(item));
             return list;
-        }
-
-        static int WordleHasLetterHint(char letter, string wordle)
-        {
-            for (int x = 0; x < 5; x++)
-            {
-                if (wordle[x] == letter)
-                {
-                    Console.WriteLine($"Found {letter} at {x}");
-                    return x;
-                }
-            }
-
-            return -1;
-        }
-
-        static int[] ScoreWord(string guess, string wordle)
-        {
-            int[] marks = new int[5] { 0, 0, 0, 0, 0 };
-            var requiredLetters = new List<char>();
-
-            for (int x = 0; x < 5; x++)
-            {
-                // Look for exact matches
-                if (guess[x] == wordle[x])
-                {
-                    marks[x] = 2;
-                    requiredLetters.Add(guess[x]);
-
-                    continue;
-                }
-
-                // Look for hints this spot or to the right
-                if (WordleHasLetterHint(guess[x], wordle) >= 0)
-                {
-                    Console.WriteLine($"Letter '{guess[x]}' exists in wordle");
-
-                    if (requiredLetters.Contains(guess[x]))
-                        marks[x] = 3;
-                    else
-                        marks[x] = 1;
-                }
-            }
-
-            return marks;
-        }
-
-        static string GetTodaysWordle()
-        {
-            string? wordle = Console.ReadLine();
-            if (string.IsNullOrEmpty(wordle) ||
-                string.IsNullOrWhiteSpace(wordle) ||
-                wordle.Length != 5)
-            {
-                Console.WriteLine("Invalid world. Must be five leters");
-                Environment.Exit(1);
-            }
-            return wordle.ToLower();
         }
 
         static void PrintWorldList(List<string> list)
