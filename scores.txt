@@ -1,32 +1,41 @@
-        Bill    WordleBot       LizBot (arose)          Lizbot (adore)  Wordlebots Word
+        Bill    WordleBot       LizBot (arose)          Lizbot (adore)  Wordlebots Word         Liz's Word      Bill's Word
 acrid   4       3               3                       2               5       (least)
 aglow   4       3               3                       3               4
+agile   4       3               4                       6               5       (slate)         3 (magic)       5 (tread)
 anger   4       3               4
 below   4       3               4
+brash   DNF     4               5                       DNF             5                       6 (magic)       4 (tread)
 broke   2       5               4
 broom   3       5               3                       4
 canoe   3       4               3                       3               3       (least)   
 cedar   3       3               3
+clerk   2       3               4                       4               4 (least)               4 (magic)       6 (tread)
 cocoa   5       3               4                       4               6 !!
 ditto   2       3               4
+flask   4       4               4                       4               3 (least)               5 (magic)       5 (tread)
 foray   4       ?               4
 ghoul   3       4               4
 grief   3       4               4                       4               6       (least)
 guppy   4       5               4
 horde   5       4               5
 hound   DNF     DNF             DNF
+jazzy   6       5               DNF                     DNF             DNF     (slate)         DNF (magic)      DNF (tread)
 joker   4       DNF             DNF
+kneel   5       3               4                       4               4       (slate)         4 (magic)        3 (tread) 
 latte   3       3               4                       4               3       (least)              
 logic   5       3               4
 metro   3       4               5
 moral   3       ?               4
-plank   3       5               4                       4               5       (least)                                              
+mouse   4       4               4                       6               3 (least)         3 (magic)       6 (tread)    
+plank   3       5               4                       4               5 (least)                                              
 plate   3       2               4
 plaza   5       3               5
 range   5       3               3
-shorn   4       4               4                       4               5       (least)               
+shorn   4       4               4                       4               5 (least)               
+skimp   3       4               6                       6               6 (least)         3 (magic)       4 (tread)
 snack   6       3               6                       6
 sulky   4       3               4
+swine   3       4               4                       4               3 (least)         5 (magic)       3 (tread)
 thump   5       3               4
 unzip   5       3               6
 whiff   4       4               3                       4
