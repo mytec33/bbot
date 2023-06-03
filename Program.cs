@@ -6,12 +6,8 @@ namespace MyApp
 {
     internal class Program
     {
-        static List<string> LettersByFrequency = new();
-        static List<string> PluralsWithS = new();
-        static List<string> WordsWithDoubles = new();
-        static readonly List<char> Vowels = new() { 'a', 'e', 'i', 'o', 'u' };
         static List<string> Words = new();
-        
+
         private static readonly int HINT_MARKER = 1;
         private static readonly int MATCH_MARKER = 2;
         private static readonly int MAX_GUESSES = 6;
@@ -20,7 +16,7 @@ namespace MyApp
         {
             string? wordle;
             var usedLetters = new List<string>();
-            
+
             try
             {
                 //WordList = ReadWordList("./5_letter_words");
@@ -59,7 +55,7 @@ namespace MyApp
                     // than picking first.
                     guess = Words[0];
                 }
-                
+
                 Console.WriteLine($"Guess {attempts}: {guess}");
 
                 if (guess == wordle)
@@ -78,43 +74,35 @@ namespace MyApp
                 marks.ScoreWord(guess, wordle);
                 marks.PrintMarks();
 
-                if (marks.IsOnlyBlanks())
+                // Work through each tile based on current score
+                for (int x = 0; x < 5; x++)
                 {
-                    Console.WriteLine("No hints/matches found. Look for word with most vowels.");
+                    Console.WriteLine($"Tile: {x + 1}");
 
-                    // Remove the letters that don't belong (all five in this case!)
-                    Words = RemoveWordsByMark(marks.marks, guess, Words);
+                    int score = marks.GetTileScore(x);
+                    string action = TileScore(score);
 
-                    // Get a list of vowels we need to find
-                    Console.Write($"Remaining vowels: ");
-                    Vowels.ForEach(vowel => Console.Write($"{vowel} "));
-                    Console.WriteLine("");
-
-                    // Find a word with the most remaining vowels
-                    guess = FindWordWithVowels(Vowels, Words, Vowels.Count);
-                    Words.Insert(0, guess);
-                }
-                else if (marks.IsOnlyHints())
-                {
-                    Console.WriteLine("Get next word based on hints");
-
-                    Words = RemoveWordsByHints(marks.marks, guess, Words);
-                }
-                else
-                {
-                    Console.WriteLine("Get words by chopping off letters");
-
-                    Words = RemoveWordsByMark(marks.marks, guess, Words);
-                    Console.WriteLine($"Words remaining: {Words.Count}");
-                    PrintWorldList(Words);
+                    if (action == "miss")
+                    {
+                        Console.WriteLine($"\t{guess[x]} is a miss. Removing from all words");
+                        Words = RemoveWordsWithLetter(guess[x], Words);
+                    }
+                    else if (action == "hint")
+                    {
+                        Console.WriteLine($"\t{guess[x]} is a miss. Removing from all words with this letter in this spot: {x + 1}");
+                        Words = RemoveWordsWithLetterByIndex(x, guess[x], Words);
+                    }
+                    else if (action == "match")
+                    {
+                        Console.WriteLine($"\t{guess[x]} is a match. Removing from all words without this letter in this spot: {x + 1}");
+                        Words = RemoveWordsWithoutLetterByIndex(x, guess[x], Words);
+                    }
                 }
 
                 Words = SortListByMarks(marks.marks, guess, Words);
 
                 Console.WriteLine($"Found {Words.Count:#,##0} potential words");
                 PrintWorldList(Words);
-
-
 
                 if (guess == null)
                 {
@@ -131,6 +119,18 @@ namespace MyApp
                 attempts++;
             }
         }
+
+        // This is probably better suited if somehow I had a type that indicated the limits
+        // so I'd only need the first 3
+        static string TileScore(int score) =>
+            score switch
+            {
+                0 => "miss",
+                1 => "hint",
+                2 => "match",
+                < 0 => "error",
+                > 2 => "error"
+            };
 
         static string FindWordWithVowels(List<char> vowels, List<string> list, int numberMatches)
         {
@@ -231,139 +231,23 @@ namespace MyApp
             return sortedWords;
         }
 
-        static List<string> RemoveWordsMissingHints(int[] marks, string guess, List<string> list)
+        static List<string> RemoveWordsWithLetter(char letter, List<string> list)
         {
-            var discards = new List<string>();
-            var hints = new List<char>();
+            var deletes = new List<string>();
 
-            for (int x = 0; x < 5; x++)
-            {
-                if (marks[x] == 1)
-                {
-                    hints.Add(guess[x]);
-                }
-            }
-
-            // Now find words that have all three letters in any combination
-            // TODO!
-            bool discard = false;
             foreach (string word in list)
             {
-                discard = false;
-                foreach (char letter in hints)
+                if (word.Contains(letter))
                 {
-                    if (!word.Contains(letter))
-                    {
-                        Console.WriteLine($"\tRemoving word with missing hint {letter}: {word}");
-                        discard = true;
-                    }
-                }
-
-                if (discard)
-                {
-                    discards.Add(word);
+                    deletes.Add(word);
                 }
             }
-            list.RemoveAll(item => discards.Contains(item));
 
-            list.Remove(guess);
+            list.RemoveAll(item => deletes.Contains(item));
             return list;
         }
 
-        static List<string> RemoveWordsByHints(int[] marks, string guess, List<string> list)
-        {
-            var discards = new List<string>();
-            var hints = new List<char>();
-
-            for (int x = 0; x < 5; x++)
-            {
-                if (marks[x] == 1)
-                {
-                    hints.Add(guess[x]);
-
-                    // Remove words with the hint at a specific location; it's elsewhere!
-                    foreach (string word in list)
-                    {
-                        if (word[x] == guess[x])
-                        {
-                            discards.Add(word);
-                        }
-                    }
-                }
-            }
-            list.RemoveAll(item => discards.Contains(item));
-
-            // Now find words that have all three letters in any combination
-            // TODO!
-            discards.Clear();
-            bool discard = false;
-            foreach (string word in list)
-            {
-                discard = false;
-                foreach (char letter in hints)
-                {
-                    if (!word.Contains(letter))
-                    {
-                        discard = true;
-                    }
-                }
-
-                if (discard)
-                {
-                    discards.Add(word);
-                }
-            }
-            list.RemoveAll(item => discards.Contains(item));
-
-            list.Remove(guess);
-            return list;
-        }
-
-        static List<string> RemoveWordsByMark(int[] marks, string guess, List<string> list)
-        {
-            var newList = new List<string>(list);
-
-            for (int x = 0; x < 5; x++)
-            {
-                if (marks[x] == 0)
-                {
-                    Console.WriteLine($"\tLetter '{guess[x]}' not present in Wordle, removing.");
-                    if (Vowels.Contains(guess[x]))
-                    {
-                        Vowels.Remove(guess[x]);
-                    }
-                    newList = RemoveWordsWithLetter(x, guess[x], newList);
-                    Console.WriteLine($"\tWords in list: {newList.Count}");
-                }
-                else if (marks[x] == 1)
-                {
-                    Console.WriteLine($"\tRemoved words with hint '{guess[x]}' at index {x + 1}");
-                    newList = RemoveWordsWithLetterInPlace(x, guess[x], newList);
-                    Console.WriteLine($"\tWords in list: {newList.Count}");
-                }
-                else if (marks[x] == 2)
-                {
-                    Console.WriteLine($"\tRemoved words missing match '{guess[x]}' at index {x + 1}");
-                    newList = RemoveWordsWithoutLetterInPlace(x, guess[x], newList);
-                    Console.WriteLine($"\tWords in list: {newList.Count}");
-                }
-                else if (marks[x] == 3)
-                {
-                    Console.WriteLine($"\tRemoved words missing hint '{guess[x]}' at index {x + 1}");
-                    newList = RemoveWordsWithLetterInPlace(x, guess[x], newList);
-                    Console.WriteLine($"\tWords in list: {newList.Count}");
-                }
-                else
-                {
-                    Console.WriteLine($"\t\tUnknown mark!! {marks[x]}");
-                }
-            }
-
-            newList.Remove(guess);
-            return newList;
-        }
-
-        static List<string> RemoveWordsWithLetterInPlace(int index, char letter, List<string> list)
+        static List<string> RemoveWordsWithLetterByIndex(int index, char letter, List<string> list)
         {
             var deletes = new List<string>();
 
@@ -375,37 +259,17 @@ namespace MyApp
                 }
             }
 
-            foreach (string word in deletes)
-            {
-                list.Remove(word);
-            }
-
+            list.RemoveAll(item => deletes.Contains(item));
             return list;
         }
 
-        static List<string> RemoveWordsWithoutLetterInPlace(int index, char letter, List<string> list)
+        static List<string> RemoveWordsWithoutLetterByIndex(int index, char letter, List<string> list)
         {
             var deletes = new List<string>();
 
             foreach (string word in list)
             {
                 if (word[index] != letter)
-                {
-                    deletes.Add(word);
-                }
-            }
-
-            list.RemoveAll(item => deletes.Contains(item));
-            return list;
-        }
-
-        static List<string> RemoveWordsWithLetter(int index, char letter, List<string> list)
-        {
-            var deletes = new List<string>();
-
-            foreach (string word in list)
-            {
-                if (word.Contains(letter))
                 {
                     deletes.Add(word);
                 }

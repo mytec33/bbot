@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,19 @@ namespace Wordlebot
         private void ResetMarks()
         {
             marks = new int[5] { 0, 0, 0, 0, 0 };
+        }
+
+        public int GetTileScore(int index)
+        {
+            Debug.Assert(index < 5 && index >= 0);
+
+            if (index >= 0 && index < 5)
+            {
+                return marks[index];
+            }
+
+            Environment.Exit(2);
+            return -99;
         }
 
         public bool IsOnlyBlanks()
@@ -71,7 +85,7 @@ namespace Wordlebot
                 if (guess[x] == wordle[x])
                 {
                     marks[x] = 2;
-                    Console.WriteLine($"Letter '{guess[x]}' exact match");
+                    Console.WriteLine($"\tLetter '{guess[x]}' exact match");
                     requiredLetters.Add(guess[x]);
 
                     continue;
@@ -80,7 +94,7 @@ namespace Wordlebot
                 // Look for hints this spot or to the right
                 if (WordleHasLetterHint(guess[x], wordle) >= 0)
                 {
-                    Console.WriteLine($"Letter '{guess[x]}' hint match");
+                    Console.WriteLine($"\tLetter '{guess[x]}' hint match");
 
                     if (requiredLetters.Contains(guess[x]))
                         marks[x] = 3;
