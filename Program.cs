@@ -6,6 +6,13 @@ namespace MyApp
 {
     internal class Program
     {
+        private struct letter
+        {
+            public int Index;
+            public char Letter;
+            public int Frequency;
+        }
+
         static List<string> Words = new();
 
         private static readonly int HINT_MARKER = 1;
@@ -19,8 +26,8 @@ namespace MyApp
 
             try
             {
-                //WordList = ReadWordList("./5_letter_words");
-                WordList wordlist = new("./5_letter_words_official");
+                var wordlist = new WordList("./5_letter_words");
+                //var wordlist = new WordList("./5_letter_words_official");
                 Words = wordlist.Words;
 
                 Console.WriteLine($"Words: {Words.Count:#,##0}");
@@ -80,7 +87,7 @@ namespace MyApp
                     Console.WriteLine($"Tile: {x + 1}");
 
                     int score = marks.GetTileScore(x);
-                    string action = TileScore(score);
+                    string action = marks.TileScore(score);
 
                     if (action == "miss")
                     {
@@ -89,8 +96,12 @@ namespace MyApp
                     }
                     else if (action == "hint")
                     {
-                        Console.WriteLine($"\t{guess[x]} is a miss. Removing from all words with this letter in this spot: {x + 1}");
+                        Console.WriteLine($"\t{guess[x]} is a hint. Removing from all words with this letter in this spot: {x + 1}");
+
+                        // Word cannot have hint in this spot, so remove those before we try to find words
+                        // with hint elsewhere otherwise this spot will be a false positive
                         Words = RemoveWordsWithLetterByIndex(x, guess[x], Words);
+                        Words = RemoveWordsWithoutLetter(guess[x], Words);
                     }
                     else if (action == "match")
                     {
@@ -99,10 +110,21 @@ namespace MyApp
                     }
                 }
 
-                Words = SortListByMarks(marks.marks, guess, Words);
-
                 Console.WriteLine($"Found {Words.Count:#,##0} potential words");
                 PrintWorldList(Words);
+
+                if (Words.Count > 1)
+                {
+                    if (marks.NoMisses())
+                    {
+                        Words = SortWordsByNoMisses(marks.marks, guess, Words);
+                    }
+                    else
+                    {
+                        //Words = SortListByMarks(marks.marks, guess, Words);
+                        Words = SortListByMisses(marks.marks, guess, Words);
+                    }
+                }
 
                 if (guess == null)
                 {
@@ -114,23 +136,9 @@ namespace MyApp
                     return;
                 }
 
-
-
                 attempts++;
             }
         }
-
-        // This is probably better suited if somehow I had a type that indicated the limits
-        // so I'd only need the first 3
-        static string TileScore(int score) =>
-            score switch
-            {
-                0 => "miss",
-                1 => "hint",
-                2 => "match",
-                < 0 => "error",
-                > 2 => "error"
-            };
 
         static string FindWordWithVowels(List<char> vowels, List<string> list, int numberMatches)
         {
@@ -176,11 +184,194 @@ namespace MyApp
             return hints;
         }
 
+        static List<string> SortListByMisses(int[] marks, string guess, List<string> wordList)
+        {
+            var frequentLetters = new List<char>();
+            var frequentLetters2 = new List<letter>();
+
+            // Find the most frequent letters in each blank position
+            for (int x = 0; x < 5; x++)
+            {
+                Console.WriteLine($"\n\tIndex: {x + 1}");
+
+                if (marks[x] == 0)
+                {
+                    var kv = GetMostFrequentLetter(wordList, x);
+
+                    if (frequentLetters.Contains(kv.Key))
+                    {
+                        Console.WriteLine("\tIgnoring duplicate");
+                    }
+                    else
+                    {
+                        frequentLetters2.Add(new letter() { Index = x, Letter = kv.Key, Frequency = kv.Value });
+                        frequentLetters.Add(kv.Key);
+                    }
+                }
+            }
+
+            var sortedFrequency = frequentLetters2.OrderByDescending(x => x.Frequency)
+                .ToList();
+
+            Console.WriteLine($"\tHighest frequency: {frequentLetters2.First().Frequency}");
+            var removeFrequences = new List<letter>();
+            if (frequentLetters2.First().Frequency > 1 && frequentLetters2.Count > 1)
+            {
+                foreach (letter l in frequentLetters2)
+                {
+                    if (l.Frequency == 1)
+                    {
+                        Console.WriteLine($"Removing letter frequency of one for: {l.Letter}");
+                        removeFrequences.Add(l);
+                    }
+                }
+
+                frequentLetters2.RemoveAll(item => removeFrequences.Contains(item));
+            }
+
+            int count = frequentLetters2.Count;
+            var matchedWords = new List<string>();
+            while (count > 0)
+            {
+                matchedWords = CandidateWordsByFrequentLetters(wordList, frequentLetters2, count);
+                if (matchedWords.Count > 0)
+                {
+                    Console.WriteLine($"Found words with {count} of {frequentLetters2.Count} matches");
+                    break;
+                }
+
+                count--;
+            }
+
+            if (matchedWords.Count < 1)
+            {
+                Console.WriteLine("No candidate words found. Quitting.");
+                Environment.Exit(3);
+            }
+
+            var alternateWord = matchedWords[0];
+            Console.WriteLine($"Alternate word: {alternateWord}");
+
+            wordList.Remove(alternateWord);
+            wordList.Insert(0, alternateWord);
+
+            return wordList;
+        }
+
+        private static List<string> SortWordsByNoMisses(int[] marks, string guess, List<string> wordList)
+        {
+            var hints = new List<char>();
+
+            for (int x = 0; x < 5; x++)
+            {
+                if (marks[x] == 1)
+                {
+                    hints.Add(guess[x]);
+                }
+            }
+
+            int count = hints.Count;
+            var matchedWords = new List<string>();
+            while (count > 0)
+            {
+                matchedWords = CandidateWordsByKnownLetters(wordList, hints);
+
+                if (matchedWords.Count > 0)
+                {
+                    Console.WriteLine($"Found words with {count} of {hints.Count} matches");
+                    break;
+                }
+
+                count--;
+            }
+
+            return matchedWords;
+        }
+
+        private static List<string> CandidateWordsByFrequentLetters(List<string> localWords, List<letter> letters, int count)
+        {
+            var matchedWords = new List<string>();
+
+            Console.WriteLine($"Looking for words with {count} of {letters.Count} matches");
+
+            foreach (string word in localWords)
+            {
+                int counter = 0;
+                foreach (letter l in letters)
+                {
+                    if (word[l.Index] == l.Letter)
+                    {
+                        counter++;
+                    }
+                }
+
+                if (counter >= count)
+                {
+                    matchedWords.Add(word);
+                }
+            }
+
+            return matchedWords;
+        }
+
+        private static List<string> CandidateWordsByKnownLetters(List<string> localWords, List<char> letters)
+        {
+            var matchedWords = new List<string>();
+
+            Console.WriteLine($"Looking for words with {letters.Count} hints");
+
+            foreach (string word in localWords)
+            {
+                int counter = 0;
+                foreach (char letter in word)
+                {
+                    foreach (char l in letters)
+                    {
+                        if (letter == l)
+                        {
+                            counter++;
+                        }
+                    }
+                }
+
+                if (counter >= letters.Count)
+                {
+                    matchedWords.Add(word);
+                }
+            }
+
+            return matchedWords;
+        }
+
+        private static KeyValuePair<char, int> GetMostFrequentLetter(List<string> list, int index)
+        {
+            var frequency = new Dictionary<char, int>();
+
+            foreach (string word in list)
+            {
+                if (frequency.ContainsKey(word[index]))
+                {
+                    frequency[word[index]] = frequency[word[index]] + 1;
+                }
+                else
+                {
+                    frequency.Add(word[index], 1);
+                }
+            }
+
+            var maxKV = frequency.FirstOrDefault(x => x.Value == frequency.Values.Max());
+            Console.WriteLine($"\tMax value: {maxKV.Key} => {maxKV.Value}");
+
+            return maxKV;
+        }
+
         static List<string> SortListByMarks(int[] marks, string guess, List<string> list)
         {
             var frequency = new Dictionary<char, int>();
             int index = 0;
 
+            // This isn't quite right. We care about hints in the index we are looking at,
+            // not hints in general
             var hints = GetHintLetters(marks, guess);
             Console.WriteLine($"Hints: {string.Join(" ", hints)}");
 
@@ -261,6 +452,25 @@ namespace MyApp
 
             list.RemoveAll(item => deletes.Contains(item));
             return list;
+        }
+
+        static List<string> RemoveWordsWithoutLetter(char letter, List<string> list)
+        {
+            var keepers = new List<string>();
+
+            foreach (string word in list)
+            {
+                for (int x = 0; x < 5; x++)
+                {
+                    if (word[x] == letter)
+                    {
+                        keepers.Add(word);
+                        break;
+                    }
+                }
+            }
+
+            return keepers;
         }
 
         static List<string> RemoveWordsWithoutLetterByIndex(int index, char letter, List<string> list)

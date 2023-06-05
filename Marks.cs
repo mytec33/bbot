@@ -9,6 +9,9 @@ namespace Wordlebot
 {
     internal class Marks
     {
+        public const int MARK_MATCH = 2;
+        public const int MARK_HINT = 1;
+
         public int[] marks;
 
         public Marks()
@@ -34,31 +37,29 @@ namespace Wordlebot
             return -99;
         }
 
-        public bool IsOnlyBlanks()
+        public bool NoMisses()
         {
+            int count = 0;
             foreach (int mark in marks)
             {
-                if (mark != 0)
+                if (mark == MARK_MATCH || mark == MARK_HINT)
                 {
-                    return false;
+                    count++;
                 }
             }
 
-            return true;
+            return count == 5 ? true : false;
         }
 
-        public bool IsOnlyHints()
-        {
-            foreach (int mark in marks)
+        public string TileScore(int score) =>
+            score switch
             {
-                if (mark == 2)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
+                0 => "miss",
+                1 => "hint",
+                2 => "match",
+                < 0 => "error",
+                > 2 => "error"
+            };
 
         static int WordleHasLetterHint(char letter, string wordle)
         {
