@@ -2,70 +2,66 @@ namespace Wordlebot.Tests
 {
     public class Wordlebot_Scoring
     {
-        [Fact]
-        public void IsTileScore_Miss()
+        [Theory]
+        [ClassData(typeof(GetTileScoreTestData))]
+        public void GetTileScore(int index, string guess, string wordle, int expected)
         {
-            var marks = new Marks();
-            string result = marks.TileScore(0);
+            var score = new Scoring();
+            score.ScoreWord(guess, wordle);
+            var result = score.GetTileScore(index);
 
-            Assert.True(result == "miss", "should be a miss");
+            Assert.True(result == expected, $"{result} should be {expected}");
         }
 
-        [Fact]
-        public void IsTileScore_Hint()
+        [Theory]
+        [InlineData(-1, "arose", "brass", 0)]
+        [InlineData(5, "arose", "brass", 0)]
+        public void GetTileScore_Exception(int index, string guess, string wordle, int expected)
         {
-            var marks = new Marks();
-            string result = marks.TileScore(1);
+            var score = new Scoring();
+            score.ScoreWord(guess, wordle);
 
-            Assert.True(result == "hint", "should be a hint");
+            Assert.Throws<InvalidOperationException>(() => score.GetTileScore(index));
         }
 
-        [Fact]
-        public void IsTileScore_Match()
+        [Theory]
+        [InlineData(0, "miss")]
+        [InlineData(1, "hint")]
+        [InlineData(2, "match")]
+        [InlineData(3, "unused match")]
+        [InlineData(-1, "error")]
+        [InlineData(4, "error")]
+        public void GetTileScoreDescription(int input, string expected)
         {
-            var marks = new Marks();
-            string result = marks.TileScore(2);
+            var score = new Scoring();
+            string result = score.GetTileScoreDescription(input);
 
-            Assert.True(result == "match", "should be a match");
+            Assert.True(result == expected, $"{result} should be {expected}");
         }
 
-        [Fact]
-        public void IsTileScore_UnusedMatch()
+        [Theory]
+        [InlineData("joker", "joker", true)]
+        [InlineData("slate", "tales", true)]
+        [InlineData("arose", "tales", false)]
+        [InlineData("balsa", "theme", false)]        
+        public void HasNoMisses(string guess, string wordle, bool expected)
         {
-            var marks = new Marks();
-            string result = marks.TileScore(3);
+            var score = new Scoring();
+            score.ScoreWord(guess, wordle);
+            var result = score.NoMisses();
 
-            Assert.True(result == "unused match", "should be an unused match");
+            Assert.True(result == expected, $"{result} should be {expected}");
         }
 
-        [Fact]
-        public void IsTileScore_LowError()
+        [Theory]
+        [ClassData(typeof(ScoreWordTestData))]
+        public void ScoreWord(string guess, string wordle, string expected)
         {
-            var marks = new Marks();
-            string resultLow = marks.TileScore(-1);
+            var score = new Scoring();
+            score.ScoreWord(guess, wordle);
+            var result = string.Join("", score.marks);
 
-            Assert.True(resultLow == "error", "should be an error");
-        }
-
-        [Fact]
-        public void IsTileScore_HighError()
-        {
-            var marks = new Marks();
-            string resultLow = marks.TileScore(4);
-
-            Assert.True(resultLow == "error", "should be an error");
+            Assert.True(result == expected, $"{guess} -> {wordle} should be {expected} not {result}");            
         }        
-
-        [Fact]
-        public void Score_Arose_Brass()
-        {
-            var marks = new Marks();
-            var expected = "12020";
-
-            marks.ScoreWord("arose", "brass");
-            
-            var result = string.Join("", marks.marks);
-            Assert.True(result == expected, $"arose -> brass should be {expected} not {result}");
-        }
     }
 }

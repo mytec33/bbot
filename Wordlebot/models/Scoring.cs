@@ -2,14 +2,14 @@
 
 namespace Wordlebot
 {
-    public class Marks
+    public class Scoring
     {
         public const int MARK_MATCH = 2;
         public const int MARK_HINT = 1;
 
         public int[] marks = new int[5] { 0, 0, 0, 0, 0 };
 
-        public Marks()
+        public Scoring()
         {
         }
 
@@ -20,15 +20,12 @@ namespace Wordlebot
 
         public int GetTileScore(int index)
         {
-            Debug.Assert(index < 5 && index >= 0);
-
             if (index >= 0 && index < 5)
             {
                 return marks[index];
             }
 
-            Environment.Exit(2);
-            return -99;
+            throw new InvalidOperationException("Tile score: index out of range.");
         }
 
         public bool NoMisses()
@@ -45,7 +42,7 @@ namespace Wordlebot
             return count == 5 ? true : false;
         }
 
-        public string TileScore(int score) =>
+        public string GetTileScoreDescription(int score) =>
             score switch
             {
                 0 => "miss",

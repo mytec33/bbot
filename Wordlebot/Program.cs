@@ -49,7 +49,7 @@ namespace Wordlebot
 
             int attempts = 1;
             string? guess = "";
-            Marks marks = new();
+            Scoring marks = new();
             while (attempts <= MAX_GUESSES)
             {
                 if (attempts == 1)
@@ -87,7 +87,7 @@ namespace Wordlebot
                     Console.WriteLine($"Tile: {x + 1}");
 
                     int score = marks.GetTileScore(x);
-                    string action = marks.TileScore(score);
+                    string action = marks.GetTileScoreDescription(score);
 
                     if (action == "miss")
                     {
