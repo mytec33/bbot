@@ -1,4 +1,4 @@
-namespace MyApp
+namespace Wordlebot
 {
     internal class WordList
     {

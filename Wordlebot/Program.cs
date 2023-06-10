@@ -2,11 +2,11 @@
 using System.Linq;
 using Wordlebot;
 
-namespace MyApp
+namespace Wordlebot
 {
     internal class Program
     {
-        private struct letter
+        private struct WordleLetter
         {
             public int Index;
             public char Letter;
@@ -26,8 +26,8 @@ namespace MyApp
 
             try
             {
-                var wordlist = new WordList("./5_letter_words");
-                //var wordlist = new WordList("./5_letter_words_official");
+                //var wordlist = new WordList("./5_letter_words");
+                var wordlist = new WordList("./5_letter_words_official");
                 Words = wordlist.Words;
 
                 Console.WriteLine($"Words: {Words.Count:#,##0}");
@@ -94,9 +94,9 @@ namespace MyApp
                         Console.WriteLine($"\t{guess[x]} is a miss. Removing from all words");
                         Words = RemoveWordsWithLetter(guess[x], Words);
                     }
-                    else if (action == "hint")
+                    else if (action == "hint" || action == "unused match")
                     {
-                        Console.WriteLine($"\t{guess[x]} is a hint. Removing from all words with this letter in this spot: {x + 1}");
+                        Console.WriteLine($"\t{guess[x]} is a {action}. Removing from all words with this letter in this spot: {x + 1}");
 
                         // Word cannot have hint in this spot, so remove those before we try to find words
                         // with hint elsewhere otherwise this spot will be a false positive
@@ -187,14 +187,14 @@ namespace MyApp
         static List<string> SortListByMisses(int[] marks, string guess, List<string> wordList)
         {
             var frequentLetters = new List<char>();
-            var frequentLetters2 = new List<letter>();
+            var frequentLetters2 = new List<WordleLetter>();
 
             // Find the most frequent letters in each blank position
             for (int x = 0; x < 5; x++)
             {
                 Console.WriteLine($"\n\tIndex: {x + 1}");
 
-                if (marks[x] == 0)
+                if (marks[x] == 0 || marks[x] == 3)
                 {
                     var kv = GetMostFrequentLetter(wordList, x);
 
@@ -204,7 +204,7 @@ namespace MyApp
                     }
                     else
                     {
-                        frequentLetters2.Add(new letter() { Index = x, Letter = kv.Key, Frequency = kv.Value });
+                        frequentLetters2.Add(new WordleLetter() { Index = x, Letter = kv.Key, Frequency = kv.Value });
                         frequentLetters.Add(kv.Key);
                     }
                 }
@@ -213,11 +213,11 @@ namespace MyApp
             var sortedFrequency = frequentLetters2.OrderByDescending(x => x.Frequency)
                 .ToList();
 
-            Console.WriteLine($"\tHighest frequency: {frequentLetters2.First().Frequency}");
-            var removeFrequences = new List<letter>();
-            if (frequentLetters2.First().Frequency > 1 && frequentLetters2.Count > 1)
+            Console.WriteLine($"\tHighest frequency: {sortedFrequency.First().Frequency}");
+            var removeFrequences = new List<WordleLetter>();
+            if (sortedFrequency.First().Frequency > 1 && sortedFrequency.Count > 1)
             {
-                foreach (letter l in frequentLetters2)
+                foreach (WordleLetter l in sortedFrequency)
                 {
                     if (l.Frequency == 1)
                     {
@@ -226,17 +226,17 @@ namespace MyApp
                     }
                 }
 
-                frequentLetters2.RemoveAll(item => removeFrequences.Contains(item));
+                sortedFrequency.RemoveAll(item => removeFrequences.Contains(item));
             }
 
-            int count = frequentLetters2.Count;
+            int count = sortedFrequency.Count;
             var matchedWords = new List<string>();
             while (count > 0)
             {
-                matchedWords = CandidateWordsByFrequentLetters(wordList, frequentLetters2, count);
+                matchedWords = CandidateWordsByFrequentLetters(wordList, sortedFrequency, count);
                 if (matchedWords.Count > 0)
                 {
-                    Console.WriteLine($"Found words with {count} of {frequentLetters2.Count} matches");
+                    Console.WriteLine($"Found words with {count} of {sortedFrequency.Count} matches");
                     break;
                 }
 
@@ -288,7 +288,7 @@ namespace MyApp
             return matchedWords;
         }
 
-        private static List<string> CandidateWordsByFrequentLetters(List<string> localWords, List<letter> letters, int count)
+        private static List<string> CandidateWordsByFrequentLetters(List<string> localWords, List<WordleLetter> letters, int count)
         {
             var matchedWords = new List<string>();
 
@@ -297,7 +297,7 @@ namespace MyApp
             foreach (string word in localWords)
             {
                 int counter = 0;
-                foreach (letter l in letters)
+                foreach (WordleLetter l in letters)
                 {
                     if (word[l.Index] == l.Letter)
                     {
