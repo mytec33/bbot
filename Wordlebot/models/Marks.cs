@@ -7,11 +7,10 @@ namespace Wordlebot
         public const int MARK_MATCH = 2;
         public const int MARK_HINT = 1;
 
-        public int[] marks;
+        public int[] marks = new int[5] { 0, 0, 0, 0, 0 };
 
         public Marks()
         {
-            ResetMarks();
         }
 
         private void ResetMarks()
@@ -57,17 +56,17 @@ namespace Wordlebot
                 > 3 => "error"
             };
 
-        static int WordleHasLetterHint(char letter, string wordle)
+        static bool WordleHasLetterHint(char letter, string wordle)
         {
             for (int x = 0; x < 5; x++)
             {
                 if (wordle[x] == letter)
                 {
-                    return x;
+                    return true;
                 }
             }
 
-            return -1;
+            return false;
         }
 
         public void ScoreWord(string guess, string wordle)
@@ -94,7 +93,7 @@ namespace Wordlebot
             for (int x = 0; x < 5; x++)
             {
                 // Look for hints this spot or to the right
-                if (WordleHasLetterHint(guess[x], wordle) >= 0)
+                if (WordleHasLetterHint(guess[x], wordle))
                 {
                     if (requiredLetters.Contains(guess[x]))
                     {
