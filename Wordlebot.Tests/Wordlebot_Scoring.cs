@@ -28,9 +28,10 @@ namespace Wordlebot.Tests
         [InlineData(0, "miss")]
         [InlineData(1, "hint")]
         [InlineData(2, "match")]
-        [InlineData(3, "unused match")]
+        [InlineData(3, "unused hint")]
+        [InlineData(4, "unused match")]
         [InlineData(-1, "error")]
-        [InlineData(4, "error")]
+        [InlineData(5, "error")]
         public void GetTileScoreDescription(int input, string expected)
         {
             var score = new Scoring();

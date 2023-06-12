@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using Wordlebot;
 
 namespace Wordlebot
@@ -194,7 +195,7 @@ namespace Wordlebot
             {
                 Console.WriteLine($"\n\tIndex: {x + 1}");
 
-                if (marks[x] == 0 || marks[x] == 3)
+                if (marks[x] == 0 || marks[x] == 4)
                 {
                     var kv = GetMostFrequentLetter(wordList, x);
 
@@ -424,91 +425,56 @@ namespace Wordlebot
 
         static List<string> RemoveWordsWithLetter(char letter, List<string> list)
         {
-            var deletes = new List<string>();
-
-            foreach (string word in list)
-            {
-                if (word.Contains(letter))
-                {
-                    deletes.Add(word);
-                }
-            }
-
+            var deletes = list.Where(word => word.Contains(letter)).ToList();
             list.RemoveAll(item => deletes.Contains(item));
+
             return list;
         }
 
         static List<string> RemoveWordsWithLetterByIndex(int index, char letter, List<string> list)
         {
-            var deletes = new List<string>();
-
-            foreach (string word in list)
-            {
-                if (word[index] == letter)
-                {
-                    deletes.Add(word);
-                }
-            }
-
+            var deletes = list.Where(word => word[index] == letter).ToList();
             list.RemoveAll(item => deletes.Contains(item));
+
             return list;
         }
 
         static List<string> RemoveWordsWithoutLetter(char letter, List<string> list)
         {
-            var keepers = new List<string>();
-
-            foreach (string word in list)
-            {
-                for (int x = 0; x < 5; x++)
-                {
-                    if (word[x] == letter)
-                    {
-                        keepers.Add(word);
-                        break;
-                    }
-                }
-            }
+            var keepers = list.Where(word => word.Any(c => c == letter)).ToList();
 
             return keepers;
         }
 
         static List<string> RemoveWordsWithoutLetterByIndex(int index, char letter, List<string> list)
         {
-            var deletes = new List<string>();
-
-            foreach (string word in list)
-            {
-                if (word[index] != letter)
-                {
-                    deletes.Add(word);
-                }
-            }
-
+            var deletes = list.Where(word => word[index] != letter).ToList();
             list.RemoveAll(item => deletes.Contains(item));
+
             return list;
         }
 
         static void PrintWorldList(List<string> list)
         {
             int count = 1;
+            StringBuilder wordLines = new StringBuilder();
 
-            Console.Write("\t");
+            wordLines.Append("\t");
             foreach (string word in list)
             {
-                Console.Write($"{word} ");
+                wordLines.Append($"{word} ");
 
                 if (count % 20 == 0)
                 {
-                    Console.WriteLine();
-                    Console.Write("\t");
+                    wordLines.Append("\n");
+                    wordLines.Append("\t");
                     count = 0;
                 }
 
                 count++;
             }
 
-            Console.WriteLine();
+            Console.WriteLine(wordLines);
         }
     }
 }

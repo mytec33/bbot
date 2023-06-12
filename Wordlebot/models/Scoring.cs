@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 namespace Wordlebot
 {
@@ -30,16 +31,7 @@ namespace Wordlebot
 
         public bool NoMisses()
         {
-            int count = 0;
-            foreach (int mark in marks)
-            {
-                if (mark == MARK_MATCH || mark == MARK_HINT)
-                {
-                    count++;
-                }
-            }
-
-            return count == 5 ? true : false;
+            return marks.All(mark => mark == MARK_MATCH || mark == MARK_HINT);
         }
 
         public string GetTileScoreDescription(int score) =>
@@ -48,22 +40,15 @@ namespace Wordlebot
                 0 => "miss",
                 1 => "hint",
                 2 => "match",
-                3 => "unused match",
+                3 => "unused hint",
+                4 => "unused match",
                 < 0 => "error",
-                > 3 => "error"
+                > 4 => "error"
             };
 
         static bool WordleHasLetterHint(char letter, string wordle)
         {
-            for (int x = 0; x < 5; x++)
-            {
-                if (wordle[x] == letter)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return wordle.Contains(letter);
         }
 
         public void ScoreWord(string guess, string wordle)
@@ -129,8 +114,8 @@ namespace Wordlebot
                         }
                         else
                         {
-                            Console.WriteLine($"\tLetter '{guess[x]}' is a miss");
-                            marks[x] = 3;
+                            Console.WriteLine($"\tLetter '{guess[x]}' is an unused match");
+                            marks[x] = 4;
                         }
 
                         Console.WriteLine($"Occurances of '{guess[x]}' is {occurrences} / {foundCount}");
@@ -143,31 +128,34 @@ namespace Wordlebot
 
         public void PrintMarks()
         {
-            string darkGrayBlock = "\u001b[90m█\u001b[0m";
-            string greenBlock = "\u001b[32m█\u001b[0m";
-            string yellowBlock = "\u001b[33;1m█\u001b[0m";
+            // Spaces at the end intentional
+            string darkGrayBlock = "\u001b[90m█\u001b[0m ";
+            string greenBlock = "\u001b[32m█\u001b[0m ";
+            string yellowBlock = "\u001b[33;1m█\u001b[0m ";
 
-            foreach(int m in marks)
+            StringBuilder tiles = new StringBuilder();
+            StringBuilder values = new StringBuilder();
+
+            foreach (int m in marks)
             {
                 if (m == 1)
                 {
-                    Console.Write($"{yellowBlock} ");
+                    tiles.Append(yellowBlock);
                 }
                 else if (m == 2)
                 {
-                    Console.Write($"{greenBlock} ");
+                    tiles.Append(greenBlock);
                 }
                 else
                 {
-                    Console.Write($"{darkGrayBlock} ");
+                    tiles.Append(darkGrayBlock);
                 }
-            }
-            Console.WriteLine();
 
-            foreach(int m in marks)
-            {
-                Console.Write($"{m} ");
+                values.Append($"{m} ");
             }
+
+            Console.WriteLine(tiles.ToString());
+            Console.WriteLine(values.ToString());
         }
     }
 }

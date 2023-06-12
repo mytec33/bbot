@@ -1,0 +1,5 @@
+Unit test all the functions in Program.cs that I converted to LINQ
+    - RemoveWordsWithLetter
+    - RemoveWordsWithLetterByIndex
+    - RemoveWordsWithoutLetter
+    - RemoveWordsWithoutLetterByIndex
