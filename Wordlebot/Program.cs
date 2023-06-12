@@ -457,24 +457,24 @@ namespace Wordlebot
         static void PrintWorldList(List<string> list)
         {
             int count = 1;
-            StringBuilder wordLines = new StringBuilder();
+            StringBuilder words = new StringBuilder();
 
-            wordLines.Append("\t");
+            words.Append("\t");
             foreach (string word in list)
             {
-                wordLines.Append($"{word} ");
+                words.Append($"{word} ");
 
                 if (count % 20 == 0)
                 {
-                    wordLines.Append("\n");
-                    wordLines.Append("\t");
+                    words.Append("\n");
+                    words.Append("\t");
                     count = 0;
                 }
 
                 count++;
             }
 
-            Console.WriteLine(wordLines);
+            Console.WriteLine(words);
         }
     }
 }
