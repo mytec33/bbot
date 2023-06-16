@@ -93,7 +93,7 @@ namespace Wordlebot
                     if (action == "miss")
                     {
                         Console.WriteLine($"\t{guess[x]} is a miss. Removing from all words");
-                        Words = RemoveWordsWithLetter(guess[x], Words);
+                        Words = WordList.RemoveWordsWithLetter(guess[x], Words);
                     }
                     else if (action == "hint" || action == "unused match")
                     {
@@ -101,13 +101,13 @@ namespace Wordlebot
 
                         // Word cannot have hint in this spot, so remove those before we try to find words
                         // with hint elsewhere otherwise this spot will be a false positive
-                        Words = RemoveWordsWithLetterByIndex(x, guess[x], Words);
-                        Words = RemoveWordsWithoutLetter(guess[x], Words);
+                        Words = WordList.RemoveWordsWithLetterByIndex(x, guess[x], Words);
+                        Words = WordList.RemoveWordsWithoutLetter(guess[x], Words);
                     }
                     else if (action == "match")
                     {
                         Console.WriteLine($"\t{guess[x]} is a match. Removing from all words without this letter in this spot: {x + 1}");
-                        Words = RemoveWordsWithoutLetterByIndex(x, guess[x], Words);
+                        Words = WordList.RemoveWordsWithoutLetterByIndex(x, guess[x], Words);
                     }
                 }
 
@@ -421,37 +421,6 @@ namespace Wordlebot
 
             List<string> sortedWords = maxKeyValueList != null ? maxKeyValueList.Select(x => x.Word).ToList().Concat(list.Except(maxKeyValueList.Select(x => x.Word))).ToList() : list;
             return sortedWords;
-        }
-
-        static List<string> RemoveWordsWithLetter(char letter, List<string> list)
-        {
-            var deletes = list.Where(word => word.Contains(letter)).ToList();
-            list.RemoveAll(item => deletes.Contains(item));
-
-            return list;
-        }
-
-        static List<string> RemoveWordsWithLetterByIndex(int index, char letter, List<string> list)
-        {
-            var deletes = list.Where(word => word[index] == letter).ToList();
-            list.RemoveAll(item => deletes.Contains(item));
-
-            return list;
-        }
-
-        static List<string> RemoveWordsWithoutLetter(char letter, List<string> list)
-        {
-            var keepers = list.Where(word => word.Any(c => c == letter)).ToList();
-
-            return keepers;
-        }
-
-        static List<string> RemoveWordsWithoutLetterByIndex(int index, char letter, List<string> list)
-        {
-            var deletes = list.Where(word => word[index] != letter).ToList();
-            list.RemoveAll(item => deletes.Contains(item));
-
-            return list;
         }
 
         static void PrintWorldList(List<string> list)
