@@ -12,8 +12,13 @@
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/Wordlebot/bin/Debug/net7.0/Wordlebot.dll",
             "args": [
-                "magic",
-                "strap"
+                "--wordlist-file",
+                "/home/bill/Dropbox/SourceCode/csharp/Wordlebot/Wordlebot/5_letter_words_official.txt",
+                "--starting-word",
+                "arose",
+                "--wordle",
+                "covet",
+                "--result-only"
             ],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console

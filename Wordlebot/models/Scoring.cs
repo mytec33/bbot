@@ -51,7 +51,7 @@ namespace Wordlebot
             return wordle.Contains(letter);
         }
 
-        public void ScoreWord(string guess, string wordle)
+        public void ScoreWord(string guess, string wordle, Logger logger)
         {
             var requiredLetters = new List<char>();
 
@@ -101,24 +101,24 @@ namespace Wordlebot
 
                         if (marks[x] == 2)
                         {
-                            Console.WriteLine($"\tLetter '{guess[x]}' exact match");
+                            logger.WriteLine($"\tLetter '{guess[x]}' exact match");
                         }
                         else if (foundCount == occurrences && marks[x] == 2)
                         {
-                            Console.WriteLine($"\tLetter '{guess[x]}' exact match");
+                            logger.WriteLine($"\tLetter '{guess[x]}' exact match");
                         }
                         else if (foundCount < occurrences && marks[x] != 2)
                         {
-                            Console.WriteLine($"\tLetter '{guess[x]}' hint match");
+                            logger.WriteLine($"\tLetter '{guess[x]}' hint match");
                             marks[x] = 1;
                         }
                         else
                         {
-                            Console.WriteLine($"\tLetter '{guess[x]}' is an unused match");
+                            logger.WriteLine($"\tLetter '{guess[x]}' is an unused match");
                             marks[x] = 4;
                         }
 
-                        Console.WriteLine($"Occurances of '{guess[x]}' is {occurrences} / {foundCount}");
+                        logger.WriteLine($"Occurances of '{guess[x]}' is {occurrences} / {foundCount}");
                     }
                     else
                         marks[x] = 1;
@@ -126,7 +126,7 @@ namespace Wordlebot
             }
         }
 
-        public void PrintMarks()
+        public void PrintMarks(Logger logger)
         {
             // Spaces at the end intentional
             string darkGrayBlock = "\u001b[90m█\u001b[0m ";
@@ -154,8 +154,8 @@ namespace Wordlebot
                 values.Append($"{m} ");
             }
 
-            Console.WriteLine(tiles.ToString());
-            Console.WriteLine(values.ToString());
+            logger.WriteLine(tiles.ToString());
+            logger.WriteLine(values.ToString());
         }
     }
 }

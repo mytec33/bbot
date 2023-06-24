@@ -6,8 +6,9 @@ namespace Wordlebot.Tests
         [ClassData(typeof(GetTileScoreTestData))]
         public void GetTileScore(int index, string guess, string wordle, int expected)
         {
+            var logger = new Logger("");
             var score = new Scoring();
-            score.ScoreWord(guess, wordle);
+            score.ScoreWord(guess, wordle, logger);
             var result = score.GetTileScore(index);
 
             Assert.True(result == expected, $"{result} should be {expected}");
@@ -18,8 +19,9 @@ namespace Wordlebot.Tests
         [InlineData(5, "arose", "brass")]
         public void GetTileScore_Exception(int index, string guess, string wordle)
         {
+            var logger = new Logger("");
             var score = new Scoring();
-            score.ScoreWord(guess, wordle);
+            score.ScoreWord(guess, wordle, logger);
 
             Assert.Throws<InvalidOperationException>(() => score.GetTileScore(index));
         }
@@ -34,6 +36,7 @@ namespace Wordlebot.Tests
         [InlineData(5, "error")]
         public void GetTileScoreDescription(int input, string expected)
         {
+            var logger = new Logger("");
             var score = new Scoring();
             string result = score.GetTileScoreDescription(input);
 
@@ -47,8 +50,9 @@ namespace Wordlebot.Tests
         [InlineData("balsa", "theme", false)]
         public void Test_NoMisses(string guess, string wordle, bool expected)
         {
+            var logger = new Logger("");
             var score = new Scoring();
-            score.ScoreWord(guess, wordle);
+            score.ScoreWord(guess, wordle, logger);
             var result = score.NoMisses();
 
             Assert.True(result == expected, $"{result} should be {expected}");
@@ -58,8 +62,9 @@ namespace Wordlebot.Tests
         [ClassData(typeof(ScoreWordTestData))]
         public void ScoreWord(string guess, string wordle, string expected)
         {
+            var logger = new Logger("");
             var score = new Scoring();
-            score.ScoreWord(guess, wordle);
+            score.ScoreWord(guess, wordle, logger);
             var result = string.Join("", score.marks);
 
             Assert.True(result == expected, $"{guess} -> {wordle} should be {expected} not {result}");
