@@ -14,9 +14,9 @@ namespace Wordlebot.Tests
         }
 
         [Theory]
-        [InlineData(-1, "arose", "brass", 0)]
-        [InlineData(5, "arose", "brass", 0)]
-        public void GetTileScore_Exception(int index, string guess, string wordle, int expected)
+        [InlineData(-1, "arose", "brass")]
+        [InlineData(5, "arose", "brass")]
+        public void GetTileScore_Exception(int index, string guess, string wordle)
         {
             var score = new Scoring();
             score.ScoreWord(guess, wordle);
@@ -44,8 +44,8 @@ namespace Wordlebot.Tests
         [InlineData("joker", "joker", true)]
         [InlineData("slate", "tales", true)]
         [InlineData("arose", "tales", false)]
-        [InlineData("balsa", "theme", false)]        
-        public void HasNoMisses(string guess, string wordle, bool expected)
+        [InlineData("balsa", "theme", false)]
+        public void Test_NoMisses(string guess, string wordle, bool expected)
         {
             var score = new Scoring();
             score.ScoreWord(guess, wordle);
@@ -62,7 +62,29 @@ namespace Wordlebot.Tests
             score.ScoreWord(guess, wordle);
             var result = string.Join("", score.marks);
 
-            Assert.True(result == expected, $"{guess} -> {wordle} should be {expected} not {result}");            
-        }        
+            Assert.True(result == expected, $"{guess} -> {wordle} should be {expected} not {result}");
+        }
+
+        [Theory]
+        [InlineData('l', "least")]
+        [InlineData('e', "least")]
+        [InlineData('a', "least")]
+        [InlineData('s', "least")]
+        [InlineData('t', "least")]
+        public void Test_WordleHasLetterHint(char letter, string guess)
+        {
+            Assert.True(Scoring.WordleHasLetterHint(letter, guess));
+        }
+
+        [Theory]
+        [InlineData('z', "least")]
+        [InlineData('y', "least")]
+        [InlineData('x', "least")]
+        [InlineData('w', "least")]
+        [InlineData('v', "least")]
+        public void Test__False_WordleHasLetterHint(char letter, string guess)
+        {
+            Assert.False(Scoring.WordleHasLetterHint(letter, guess));
+        }
     }
 }

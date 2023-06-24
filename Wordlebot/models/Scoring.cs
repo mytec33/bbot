@@ -46,7 +46,7 @@ namespace Wordlebot
                 > 4 => "error"
             };
 
-        static bool WordleHasLetterHint(char letter, string wordle)
+        public static bool WordleHasLetterHint(char letter, string wordle)
         {
             return wordle.Contains(letter);
         }

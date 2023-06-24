@@ -9,11 +9,12 @@ namespace Wordlebot
     {
         private struct WordleLetter
         {
-            public int Index;
             public char Letter;
             public int Frequency;
         }
 
+        static List<char> FrequentLetters = new() { 't', 's', 'r', 'e', 'a', 'i', 'c', 'n', 'l' };
+        static List<string> PlayedGuesses = new();
         static List<string> Words = new();
 
         private static readonly int HINT_MARKER = 1;
@@ -25,10 +26,17 @@ namespace Wordlebot
             string? wordle;
             var usedLetters = new List<string>();
 
+            if (args.Length != 2)
+            {
+                Console.WriteLine("Usage:");
+                Console.WriteLine("\tdotnet run guess wordle");
+                Environment.Exit(1);
+            }
+
             try
             {
-                //var wordlist = new WordList("./5_letter_words");
-                var wordlist = new WordList("./5_letter_words_official");
+                //var wordlist = new WordList("./Wordlebot/5_letter_words.txt");
+                var wordlist = new WordList("./5_letter_words_official.txt");
                 Words = wordlist.Words;
 
                 Console.WriteLine($"Words: {Words.Count:#,##0}");
@@ -63,6 +71,8 @@ namespace Wordlebot
                     // than picking first.
                     guess = Words[0];
                 }
+                PlayedGuesses.Add(guess);
+                RemoveFrequentLettersByGuess(guess);
 
                 Console.WriteLine($"Guess {attempts}: {guess}");
 
@@ -122,7 +132,6 @@ namespace Wordlebot
                     }
                     else
                     {
-                        //Words = SortListByMarks(marks.marks, guess, Words);
                         Words = SortListByMisses(marks.marks, guess, Words);
                     }
                 }
@@ -141,48 +150,12 @@ namespace Wordlebot
             }
         }
 
-        static string FindWordWithVowels(List<char> vowels, List<string> list, int numberMatches)
+        static void RemoveFrequentLettersByGuess(string guess)
         {
-            int count = 0;
-
-            foreach (string word in list)
+            foreach (char letter in guess)
             {
-                count = 0;
-                foreach (char vowel in vowels)
-                {
-                    if (word.Contains(vowel))
-                    {
-                        count++;
-                    }
-                }
-
-                if (count == vowels.Count)
-                {
-                    return word;
-                }
+                FrequentLetters.Remove(letter);
             }
-
-            if (count < vowels.Count)
-            {
-                FindWordWithVowels(vowels, list, vowels.Count - 1);
-            }
-
-            return "";
-        }
-
-        static List<char> GetHintLetters(int[] marks, string guess)
-        {
-            var hints = new List<char>();
-
-            for (int x = 0; x < 5; x++)
-            {
-                if (marks[x] == HINT_MARKER)
-                {
-                    hints.Add(guess[x]);
-                }
-            }
-
-            return hints;
         }
 
         static List<string> SortListByMisses(int[] marks, string guess, List<string> wordList)
@@ -190,45 +163,8 @@ namespace Wordlebot
             var frequentLetters = new List<char>();
             var frequentLetters2 = new List<WordleLetter>();
 
-            // Find the most frequent letters in each blank position
-            for (int x = 0; x < 5; x++)
-            {
-                Console.WriteLine($"\n\tIndex: {x + 1}");
-
-                if (marks[x] == 0 || marks[x] == 4)
-                {
-                    var kv = GetMostFrequentLetter(wordList, x);
-
-                    if (frequentLetters.Contains(kv.Key))
-                    {
-                        Console.WriteLine("\tIgnoring duplicate");
-                    }
-                    else
-                    {
-                        frequentLetters2.Add(new WordleLetter() { Index = x, Letter = kv.Key, Frequency = kv.Value });
-                        frequentLetters.Add(kv.Key);
-                    }
-                }
-            }
-
-            var sortedFrequency = frequentLetters2.OrderByDescending(x => x.Frequency)
-                .ToList();
-
-            Console.WriteLine($"\tHighest frequency: {sortedFrequency.First().Frequency}");
-            var removeFrequences = new List<WordleLetter>();
-            if (sortedFrequency.First().Frequency > 1 && sortedFrequency.Count > 1)
-            {
-                foreach (WordleLetter l in sortedFrequency)
-                {
-                    if (l.Frequency == 1)
-                    {
-                        Console.WriteLine($"Removing letter frequency of one for: {l.Letter}");
-                        removeFrequences.Add(l);
-                    }
-                }
-
-                sortedFrequency.RemoveAll(item => removeFrequences.Contains(item));
-            }
+            var sortedFrequency = AddLettersToFrequency(wordList);
+            sortedFrequency = sortedFrequency.OrderByDescending(x => x.Frequency).ToList();
 
             int count = sortedFrequency.Count;
             var matchedWords = new List<string>();
@@ -241,6 +177,7 @@ namespace Wordlebot
                     break;
                 }
 
+                sortedFrequency.Remove(sortedFrequency.Last());
                 count--;
             }
 
@@ -257,6 +194,68 @@ namespace Wordlebot
             wordList.Insert(0, alternateWord);
 
             return wordList;
+        }
+
+        private static List<WordleLetter> AddLettersToFrequency(List<string> wordList)
+        {
+            var foundLetters = new List<char>();
+            var frequentLetters = new Dictionary<char, int>();
+            var sortedFrequency = new List<WordleLetter>();
+
+            foreach (string word in wordList)
+            {
+                foundLetters.Clear();
+                foreach (char letter in word)
+                {
+                    if (foundLetters.Contains(letter))
+                    {
+                        // We don't want to give extra weight to words with double letters like 'p' in guppy
+                        continue;
+                    }
+
+                    foundLetters.Add(letter);
+                    if (frequentLetters.ContainsKey(letter))
+                    {
+                        frequentLetters[letter] = frequentLetters[letter] + 1;
+                    }
+                    else
+                    {
+                        frequentLetters.Add(letter, 1);
+                    }
+                }
+            }
+            var frequentLettersList = frequentLetters.OrderByDescending(x => x.Value).ToList();
+
+            foreach (KeyValuePair<char, int> kv in frequentLettersList)
+            {
+                bool found = false;
+                foreach (WordleLetter letter in sortedFrequency)
+                {
+                    if (letter.Letter == kv.Key)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found == false)
+                {
+                    var wordleLetter = new WordleLetter()
+                    {
+                        Letter = kv.Key,
+                        Frequency = kv.Value
+                    };
+
+                    sortedFrequency.Add(wordleLetter);
+                }
+
+                if (sortedFrequency.Count == 5)
+                {
+                    break;
+                }
+            }
+
+            return sortedFrequency;
         }
 
         private static List<string> SortWordsByNoMisses(int[] marks, string guess, List<string> wordList)
@@ -300,7 +299,7 @@ namespace Wordlebot
                 int counter = 0;
                 foreach (WordleLetter l in letters)
                 {
-                    if (word[l.Index] == l.Letter)
+                    if (word.Contains(l.Letter))
                     {
                         counter++;
                     }
@@ -342,85 +341,6 @@ namespace Wordlebot
             }
 
             return matchedWords;
-        }
-
-        private static KeyValuePair<char, int> GetMostFrequentLetter(List<string> list, int index)
-        {
-            var frequency = new Dictionary<char, int>();
-
-            foreach (string word in list)
-            {
-                if (frequency.ContainsKey(word[index]))
-                {
-                    frequency[word[index]] = frequency[word[index]] + 1;
-                }
-                else
-                {
-                    frequency.Add(word[index], 1);
-                }
-            }
-
-            var maxKV = frequency.FirstOrDefault(x => x.Value == frequency.Values.Max());
-            Console.WriteLine($"\tMax value: {maxKV.Key} => {maxKV.Value}");
-
-            return maxKV;
-        }
-
-        static List<string> SortListByMarks(int[] marks, string guess, List<string> list)
-        {
-            var frequency = new Dictionary<char, int>();
-            int index = 0;
-
-            // This isn't quite right. We care about hints in the index we are looking at,
-            // not hints in general
-            var hints = GetHintLetters(marks, guess);
-            Console.WriteLine($"Hints: {string.Join(" ", hints)}");
-
-            for (int x = 0; x < 5; x++)
-            {
-                if (marks[x] != MATCH_MARKER)
-                {
-                    index = x;
-                    break;
-                }
-            }
-            Console.WriteLine($"First index with no match: {index + 1}");
-
-            // Find first empty mark and find most common letter
-            foreach (string word in list)
-            {
-                if (frequency.ContainsKey(word[index]))
-                {
-                    frequency[word[index]] = frequency[word[index]] + 1;
-                }
-                else
-                {
-                    frequency.Add(word[index], 1);
-                }
-            }
-
-            // Remove any hints we have from the frequency list
-            frequency = frequency.Where(kv => !hints.Contains(kv.Key))
-                .ToDictionary(kv => kv.Key, kv => kv.Value);
-
-            foreach (KeyValuePair<char, int> kv in frequency)
-            {
-                Console.WriteLine($"\t{kv.Key}: {kv.Value}");
-            }
-
-            var maxKeyValuePair = frequency.FirstOrDefault(x => x.Value == frequency.Values.Max());
-            char maxKey = maxKeyValuePair.Key;
-            int maxValue = maxKeyValuePair.Value;
-            Console.WriteLine($"\tMax value: {maxKey} => {maxValue}");
-
-            var maxKeyValueList = list
-                .Select(word => new { Word = word, Char = word.ElementAtOrDefault(index) })
-                .GroupBy(x => x.Char)
-                .OrderByDescending(group => group.Count())
-                .FirstOrDefault();
-
-            List<string> sortedWords = maxKeyValueList != null ? maxKeyValueList.Select(x => x.Word).ToList().Concat(list.Except(maxKeyValueList.Select(x => x.Word))).ToList() : list;
-            return sortedWords;
         }
 
         static void PrintWorldList(List<string> list)
