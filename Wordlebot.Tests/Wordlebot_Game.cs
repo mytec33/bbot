@@ -10,7 +10,12 @@ namespace Wordlebot.Tests
         [ClassData(typeof(GameResults_Magic))]        
         public void GetWordleResult(string startingWord, string wordle, string expected)
         {
-            string projectDirectory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName;
+            string? projectDirectory = Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.Parent?.FullName;
+            if (projectDirectory == null)
+            {
+                Assert.Fail($"Wordlist file not found.");
+            }
+
             string WordListFile = Path.Combine(projectDirectory, "Wordlebot", "5_letter_words_official.txt");
             var wordlist = new WordList(WordListFile);
             var Words = wordlist.Words;

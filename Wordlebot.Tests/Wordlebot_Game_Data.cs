@@ -67,6 +67,7 @@ namespace Wordlebot.Tests
             Add("arose", "unzip", "4 tries");
             Add("arose", "whiff", "4 tries");
             Add("arose", "covet", "4 tries");
+            Add("arose", "grand", "4 tries");            
         }
     }
 
@@ -137,6 +138,7 @@ namespace Wordlebot.Tests
             Add("crane", "unzip", "4 tries");
             Add("crane", "whiff", "4 tries");
             Add("crane", "covet", "3 tries");
+            Add("crane", "grand", "3 tries");            
         }
     }
 
@@ -207,6 +209,7 @@ namespace Wordlebot.Tests
             Add("magic", "unzip", "3 tries");
             Add("magic", "whiff", "4 tries");
             Add("magic", "covet", "6 tries");
+            Add("magic", "grand", "4 tries");
         }
     }
 }

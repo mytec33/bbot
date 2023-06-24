@@ -1,6 +1,10 @@
 ﻿using System;
 using Wordlebot;
 
+/*
+dotnet run --wordlist-file ./5_letter_words_official.txt  --starting-word magic --wordle covet --result-only
+*/
+
 namespace Wordlebot
 {
     internal class Program
