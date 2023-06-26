@@ -15,7 +15,7 @@ namespace Wordlebot
         static string StartingWord = "";
         static string Wordle = "";
 
-        private Logger _Logger;
+        private ILogger _Logger { get; init; }
 
         static List<char> FrequentLetters = new() { 't', 's', 'r', 'e', 'a', 'i', 'c', 'n', 'l' };
         static List<string> PlayedGuesses = new();
@@ -25,7 +25,7 @@ namespace Wordlebot
         private static readonly int MATCH_MARKER = 2;
         private static readonly int MAX_GUESSES = 6;
 
-        public WordleGame(Logger logger, List<string> words, string startingWord, string wordle, bool resultsOnly)
+        public WordleGame(ILogger logger, List<string> words, string startingWord, string wordle, bool resultsOnly)
         {
             _Logger = logger;
             ResultOnly = resultsOnly;
@@ -42,7 +42,7 @@ namespace Wordlebot
 
             int attempts = 1;
             string? guess = "";
-            Scoring marks = new();
+            Scoring marks = new(_Logger);
             while (attempts <= MAX_GUESSES)
             {
                 if (attempts == 1)
@@ -77,8 +77,8 @@ namespace Wordlebot
                 }
 
                 _Logger.WriteLine($"Scoring word: {guess}");
-                marks.ScoreWord(guess, Wordle, _Logger);
-                marks.PrintMarks(_Logger);
+                marks.ScoreWord(guess, Wordle);
+                marks.PrintMarks();
 
                 // Work through each tile based on current score
                 for (int x = 0; x < 5; x++)
@@ -110,17 +110,17 @@ namespace Wordlebot
                 }
 
                 _Logger.WriteLine($"Found {Words.Count:#,##0} potential words");
-                PrintWorldList(Words, _Logger);
+                PrintWorldList(Words);
 
                 if (Words.Count > 1)
                 {
                     if (marks.NoMisses())
                     {
-                        Words = SortWordsByNoMisses(marks.marks, guess, Words, _Logger);
+                        Words = SortWordsByNoMisses(marks.marks, guess, Words);
                     }
                     else
                     {
-                        Words = SortListByMisses(marks.marks, guess, Words, _Logger);
+                        Words = SortListByMisses(marks.marks, guess, Words);
                     }
                 }
 
@@ -134,12 +134,12 @@ namespace Wordlebot
                 }
 
                 attempts++;
-            }      
+            }
 
-            return "Reached unexepected return point";      
+            return "Reached unexepected return point";
         }
 
-       static void RemoveFrequentLettersByGuess(string guess)
+        static void RemoveFrequentLettersByGuess(string guess)
         {
             foreach (char letter in guess)
             {
@@ -147,7 +147,7 @@ namespace Wordlebot
             }
         }
 
-        static List<string> SortListByMisses(int[] marks, string guess, List<string> wordList, Logger logger)
+        private List<string> SortListByMisses(int[] marks, string guess, List<string> wordList)
         {
             var frequentLetters = new List<char>();
             var frequentLetters2 = new List<WordleLetter>();
@@ -159,11 +159,11 @@ namespace Wordlebot
             var matchedWords = new List<string>();
             while (count > 0)
             {
-                logger.WriteLine($"Looking for words with {count} of {sortedFrequency.Count} matches");
+                _Logger.WriteLine($"Looking for words with {count} of {sortedFrequency.Count} matches");
                 matchedWords = CandidateWordsByFrequentLetters(wordList, sortedFrequency, count);
                 if (matchedWords.Count > 0)
                 {
-                    logger.WriteLine($"Found words with {count} of {sortedFrequency.Count} matches");
+                    _Logger.WriteLine($"Found words with {count} of {sortedFrequency.Count} matches");
                     break;
                 }
 
@@ -173,12 +173,12 @@ namespace Wordlebot
 
             if (matchedWords.Count < 1)
             {
-                logger.WriteLine("No candidate words found. Quitting.");
+                _Logger.WriteLine("No candidate words found. Quitting.");
                 Environment.Exit(3);
             }
 
             var alternateWord = matchedWords[0];
-            logger.WriteLine($"Alternate word: {alternateWord}");
+            _Logger.WriteLine($"Alternate word: {alternateWord}");
 
             wordList.Remove(alternateWord);
             wordList.Insert(0, alternateWord);
@@ -248,7 +248,7 @@ namespace Wordlebot
             return sortedFrequency;
         }
 
-        private static List<string> SortWordsByNoMisses(int[] marks, string guess, List<string> wordList, Logger logger)
+        private List<string> SortWordsByNoMisses(int[] marks, string guess, List<string> wordList)
         {
             var hints = new List<char>();
 
@@ -264,11 +264,11 @@ namespace Wordlebot
             var matchedWords = new List<string>();
             while (count > 0)
             {
-                matchedWords = CandidateWordsByKnownLetters(wordList, hints, logger);
+                matchedWords = CandidateWordsByKnownLetters(wordList, hints);
 
                 if (matchedWords.Count > 0)
                 {
-                    logger.WriteLine($"Found words with {count} of {hints.Count} matches");
+                    _Logger.WriteLine($"Found words with {count} of {hints.Count} matches");
                     break;
                 }
 
@@ -302,11 +302,11 @@ namespace Wordlebot
             return matchedWords;
         }
 
-        private static List<string> CandidateWordsByKnownLetters(List<string> localWords, List<char> letters, Logger logger)
+        private List<string> CandidateWordsByKnownLetters(List<string> localWords, List<char> letters)
         {
             var matchedWords = new List<string>();
 
-            logger.WriteLine($"Looking for words with {letters.Count} hints");
+            _Logger.WriteLine($"Looking for words with {letters.Count} hints");
 
             foreach (string word in localWords)
             {
@@ -331,7 +331,7 @@ namespace Wordlebot
             return matchedWords;
         }
 
-        static void PrintWorldList(List<string> list, Logger logger)
+        private void PrintWorldList(List<string> list)
         {
             int count = 1;
             StringBuilder words = new StringBuilder();
@@ -351,7 +351,7 @@ namespace Wordlebot
                 count++;
             }
 
-            logger.WriteLine(words.ToString());
-        }        
+            _Logger.WriteLine(words.ToString());
+        }
     }
 }

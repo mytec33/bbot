@@ -8,7 +8,8 @@ namespace Wordlebot.Tests
         [ClassData(typeof(RemoveWordsWitLetterData))]
         public void Test_RemoveWordsWitLetter(char letter, List<string> list, List<string> expected)
         {
-            var score = new Scoring();
+            var logger = new FileLogger("");
+            var score = new Scoring(logger);
             var result = WordList.RemoveWordsWithLetter(letter, list);
 
             Assert.Equal(result, expected);
@@ -18,7 +19,8 @@ namespace Wordlebot.Tests
         [ClassData(typeof(RemoveWordsWithLetterByIndexData))]
         public void Test_RemoveWordsWithLetterByIndex(int index, char letter, List<string> list, List<string> expected)
         {
-            var score = new Scoring();
+            var logger = new FileLogger("");
+            var score = new Scoring(logger);
             var result = WordList.RemoveWordsWithLetterByIndex(index, letter, list);
 
             Assert.Equal(result, expected);
@@ -28,7 +30,8 @@ namespace Wordlebot.Tests
         [ClassData(typeof(RemoveWordsWithoutLetterData))]
         public void Test_RemoveWordsWithoutLetter(char letter, List<string> list, List<string> expected)
         {
-            var score = new Scoring();
+            var logger = new FileLogger("");
+            var score = new Scoring(logger);
             var result = WordList.RemoveWordsWithoutLetter(letter, list);
 
             Assert.Equal(result, expected);
@@ -38,7 +41,8 @@ namespace Wordlebot.Tests
         [ClassData(typeof(RemoveWordsWithoutLetterByIndexData))]
         public void Test_RemoveWordsWithoutLetterByIndex(int index, char letter, List<string> list, List<string> expected)
         {
-            var score = new Scoring();
+            var logger = new FileLogger("");
+            var score = new Scoring(logger);
             var result = WordList.RemoveWordsWithoutLetterByIndex(index, letter, list);
 
             Assert.Equal(result, expected);

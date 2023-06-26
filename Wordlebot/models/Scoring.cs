@@ -5,13 +5,16 @@ namespace Wordlebot
 {
     public class Scoring
     {
+        private ILogger _Logger { get; init; }
+
         public const int MARK_MATCH = 2;
         public const int MARK_HINT = 1;
 
         public int[] marks = new int[5] { 0, 0, 0, 0, 0 };
 
-        public Scoring()
+        public Scoring(ILogger fileLogger)
         {
+            _Logger = fileLogger;
         }
 
         private void ResetMarks()
@@ -51,7 +54,7 @@ namespace Wordlebot
             return wordle.Contains(letter);
         }
 
-        public void ScoreWord(string guess, string wordle, Logger logger)
+        public void ScoreWord(string guess, string wordle)
         {
             var requiredLetters = new List<char>();
 
@@ -101,24 +104,24 @@ namespace Wordlebot
 
                         if (marks[x] == 2)
                         {
-                            logger.WriteLine($"\tLetter '{guess[x]}' exact match");
+                            _Logger.WriteLine($"\tLetter '{guess[x]}' exact match");
                         }
                         else if (foundCount == occurrences && marks[x] == 2)
                         {
-                            logger.WriteLine($"\tLetter '{guess[x]}' exact match");
+                            _Logger.WriteLine($"\tLetter '{guess[x]}' exact match");
                         }
                         else if (foundCount < occurrences && marks[x] != 2)
                         {
-                            logger.WriteLine($"\tLetter '{guess[x]}' hint match");
+                            _Logger.WriteLine($"\tLetter '{guess[x]}' hint match");
                             marks[x] = 1;
                         }
                         else
                         {
-                            logger.WriteLine($"\tLetter '{guess[x]}' is an unused match");
+                            _Logger.WriteLine($"\tLetter '{guess[x]}' is an unused match");
                             marks[x] = 4;
                         }
 
-                        logger.WriteLine($"Occurances of '{guess[x]}' is {occurrences} / {foundCount}");
+                        _Logger.WriteLine($"Occurances of '{guess[x]}' is {occurrences} / {foundCount}");
                     }
                     else
                         marks[x] = 1;
@@ -126,7 +129,7 @@ namespace Wordlebot
             }
         }
 
-        public void PrintMarks(Logger logger)
+        public void PrintMarks()
         {
             // Spaces at the end intentional
             string darkGrayBlock = "\u001b[90m█\u001b[0m ";
@@ -154,8 +157,8 @@ namespace Wordlebot
                 values.Append($"{m} ");
             }
 
-            logger.WriteLine(tiles.ToString());
-            logger.WriteLine(values.ToString());
+            _Logger.WriteLine(tiles.ToString());
+            _Logger.WriteLine(values.ToString());
         }
     }
 }

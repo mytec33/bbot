@@ -1,10 +1,10 @@
 namespace Wordlebot
 {
-    public class Logger
+    public class FileLogger : ILogger
     {
         private string Level = "";
 
-        public Logger(string level)
+        public FileLogger(string level)
         {
             Level = level;
         }

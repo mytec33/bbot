@@ -28,6 +28,11 @@ namespace Wordlebot
                 {
                     list.Add(line);
                 }
+
+                if (list.Count < 1)
+                {
+                    throw new WordListReadingException("No data found in file.", new WordListReadingException(""));
+                }
             }
             catch (Exception ex)
             {

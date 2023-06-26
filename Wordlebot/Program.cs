@@ -11,22 +11,17 @@ namespace Wordlebot
     {
         static List<string> Words = new();
 
-        static bool ResultOnly = false;
-        static string StartingWord = "";
-        static string Wordle = "";
-        static string WordListFile = "";
+        private static bool ResultOnly = false;
+        private static string StartingWord = "";
+        private static string Wordle = "";
+        private static string WordListFile = "";
 
         static void Main(string[] args)
         {
-            var usedLetters = new List<string>();
-
             var processedArgsResult = ProcessedArgs(args);
             if (processedArgsResult != "")
             {
-                Console.WriteLine(processedArgsResult);
-
-                Console.WriteLine("\nUsage:");
-                Console.WriteLine("\tdotnet run [--result-only] --wordlist-file file --starting-word guess --wordle wordle");
+                PrintUsage(processedArgsResult);
                 Environment.Exit(1);
             }
 
@@ -34,12 +29,6 @@ namespace Wordlebot
             {
                 var wordlist = new WordList(WordListFile);
                 Words = wordlist.Words;
-
-                if (Words.Count < 1)
-                {
-                    Console.WriteLine("No data file in file. Exiting.");
-                    return;
-                }
             }
             catch (Exception ex)
             {
@@ -52,12 +41,20 @@ namespace Wordlebot
             {
                 loggingLevel = "quiet";
             }
-            Logger logger = new(loggingLevel);
+            var logger = new FileLogger(loggingLevel);
 
             var game = new WordleGame(logger, Words, StartingWord, Wordle, ResultOnly);
             var result = game.PlayWordle();
 
             Console.WriteLine(result);
+        }
+
+        static void PrintUsage(string result)
+        {
+            Console.WriteLine(result);
+
+            Console.WriteLine("\nUsage:");
+            Console.WriteLine("\tdotnet run [--result-only] --wordlist-file file --starting-word guess --wordle wordle");
         }
 
         static string ProcessedArgs(string[] args)
