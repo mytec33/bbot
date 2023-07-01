@@ -6,7 +6,7 @@ namespace Wordlebot.Tests
         [ClassData(typeof(GetTileScoreTestData))]
         public void GetTileScore(int index, string guess, string wordle, int expected)
         {
-            var logger = new FileLogger("");
+            var logger = new FileLogger("quiet");
             var score = new Scoring(logger);
             score.ScoreWord(guess, wordle);
             var result = score.GetTileScore(index);
@@ -19,7 +19,7 @@ namespace Wordlebot.Tests
         [InlineData(5, "arose", "brass")]
         public void GetTileScore_Exception(int index, string guess, string wordle)
         {
-            var logger = new FileLogger("");
+            var logger = new FileLogger("quiet");
             var score = new Scoring(logger);
             score.ScoreWord(guess, wordle);
 
@@ -36,7 +36,7 @@ namespace Wordlebot.Tests
         [InlineData(5, "error")]
         public void GetTileScoreDescription(int input, string expected)
         {
-            var logger = new FileLogger("");
+            var logger = new FileLogger("quiet");
             var score = new Scoring(logger);
             string result = score.GetTileScoreDescription(input);
 
@@ -50,7 +50,7 @@ namespace Wordlebot.Tests
         [InlineData("balsa", "theme", false)]
         public void Test_NoMisses(string guess, string wordle, bool expected)
         {
-            var logger = new FileLogger("");
+            var logger = new FileLogger("quiet");
             var score = new Scoring(logger);
             score.ScoreWord(guess, wordle);
             var result = score.NoMisses();
@@ -62,7 +62,7 @@ namespace Wordlebot.Tests
         [ClassData(typeof(ScoreWordTestData))]
         public void ScoreWord(string guess, string wordle, string expected)
         {
-            var logger = new FileLogger("");
+            var logger = new FileLogger("quiet");
             var score = new Scoring(logger);
             score.ScoreWord(guess, wordle);
             var result = string.Join("", score.marks);

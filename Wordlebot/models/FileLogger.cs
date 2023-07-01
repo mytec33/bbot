@@ -11,7 +11,7 @@ namespace Wordlebot
 
         public void WriteLine(string message)
         {
-            if (Level == "quiet")
+            if (Level.ToLower() == "quiet")
             {
                 return;
             }

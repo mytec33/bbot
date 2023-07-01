@@ -42,7 +42,7 @@ namespace Wordlebot
 
             int attempts = 1;
             string? guess = "";
-            Scoring marks = new(_Logger);
+            var marks = new Scoring(_Logger);
             while (attempts <= MAX_GUESSES)
             {
                 if (attempts == 1)
@@ -53,6 +53,8 @@ namespace Wordlebot
                 {
                     // TODO: if more than one item, this should have some heuristic rather
                     // than picking first.
+                    //ReduceSet(Words);
+
                     guess = Words[0];
                 }
                 PlayedGuesses.Add(guess);
@@ -145,6 +147,77 @@ namespace Wordlebot
             {
                 FrequentLetters.Remove(letter);
             }
+        }
+
+        private void ReduceSet(List<string> wordList)
+        {
+            var logger = new FileLogger("quiet");
+
+            foreach(string word in wordList)
+            {
+                var words = Words.ToList();
+                logger.WriteLine($"Scoring word: {word}");
+
+                var marks = new Scoring(logger);
+                marks.ScoreWord(word, Wordle);
+                marks.PrintMarks();
+
+                // Work through each tile based on current score
+                for (int x = 0; x < 5; x++)
+                {
+                    logger.WriteLine($"Tile: {x + 1}");
+
+                    int score = marks.GetTileScore(x);
+                    string action = marks.GetTileScoreDescription(score);
+
+                    if (action == "miss")
+                    {
+                        logger.WriteLine($"\t{word[x]} is a miss. Removing from all words");
+                        words = WordList.RemoveWordsWithLetter(word[x], words);
+                    }
+                    else if (action == "hint" || action == "unused match")
+                    {
+                        logger.WriteLine($"\t{word[x]} is a {action}. Removing from all words with this letter in this spot: {x + 1}");
+
+                        // Word cannot have hint in this spot, so remove those before we try to find words
+                        // with hint elsewhere otherwise this spot will be a false positive
+                        words = WordList.RemoveWordsWithLetterByIndex(x, word[x], words);
+                        words = WordList.RemoveWordsWithoutLetter(word[x], words);
+                    }
+                    else if (action == "match")
+                    {
+                        logger.WriteLine($"\t{word[x]} is a match. Removing from all words without this letter in this spot: {x + 1}");
+                        words = WordList.RemoveWordsWithoutLetterByIndex(x, word[x], words);
+                    }
+
+                }
+
+                _Logger.WriteLine($"{word} => {words.Count}");
+            }
+        }
+
+        private static bool HasDoubleLetter(string word)
+        {
+            var frequency = new Dictionary<char, int>();
+
+            foreach(char letter in word)
+            {
+                if (frequency.ContainsKey(letter))
+                {
+                    frequency[letter]++;
+                }
+                else
+                {
+                    frequency.Add(letter, 1);
+                }
+
+                if (frequency[letter] >= 2)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private List<string> SortListByMisses(int[] marks, string guess, List<string> wordList)
@@ -278,7 +351,7 @@ namespace Wordlebot
             return matchedWords;
         }
 
-        private static List<string> CandidateWordsByFrequentLetters(List<string> localWords, List<WordleLetter> letters, int count)
+        private List<string> CandidateWordsByFrequentLetters(List<string> localWords, List<WordleLetter> letters, int count)
         {
             var matchedWords = new List<string>();
 
