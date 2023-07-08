@@ -7,7 +7,7 @@ namespace Wordlebot.Tests
         public void GetTileScore(int index, string guess, string wordle, int expected)
         {
             var logger = new FileLogger("quiet");
-            var score = new Scoring(logger);
+            var score = new WordleScoring(logger);
             score.ScoreWord(guess, wordle);
             var result = score.GetTileScore(index);
 
@@ -20,7 +20,7 @@ namespace Wordlebot.Tests
         public void GetTileScore_Exception(int index, string guess, string wordle)
         {
             var logger = new FileLogger("quiet");
-            var score = new Scoring(logger);
+            var score = new WordleScoring(logger);
             score.ScoreWord(guess, wordle);
 
             Assert.Throws<InvalidOperationException>(() => score.GetTileScore(index));
@@ -36,7 +36,7 @@ namespace Wordlebot.Tests
         [InlineData(5, "error")]
         public void GetTileScoreDescription(int input, string expected)
         {
-            string result = Scoring.GetTileScoreDescription(input);
+            string result = WordleScoring.GetTileScoreDescription(input);
 
             Assert.True(result == expected, $"{result} should be {expected}");
         }
@@ -49,7 +49,7 @@ namespace Wordlebot.Tests
         public void Test_NoMisses(string guess, string wordle, bool expected)
         {
             var logger = new FileLogger("quiet");
-            var score = new Scoring(logger);
+            var score = new WordleScoring(logger);
             score.ScoreWord(guess, wordle);
             var result = score.NoMisses();
 
@@ -61,7 +61,7 @@ namespace Wordlebot.Tests
         public void ScoreWord(string guess, string wordle, string expected)
         {
             var logger = new FileLogger("quiet");
-            var score = new Scoring(logger);
+            var score = new WordleScoring(logger);
             score.ScoreWord(guess, wordle);
             var result = string.Join("", score.marks);
 
@@ -76,7 +76,7 @@ namespace Wordlebot.Tests
         [InlineData('t', "least")]
         public void Test_WordleHasLetterHint(char letter, string guess)
         {
-            Assert.True(Scoring.WordleHasLetterHint(letter, guess));
+            Assert.True(WordleScoring.WordleHasLetterHint(letter, guess));
         }
 
         [Theory]
@@ -87,7 +87,7 @@ namespace Wordlebot.Tests
         [InlineData('v', "least")]
         public void Test__False_WordleHasLetterHint(char letter, string guess)
         {
-            Assert.False(Scoring.WordleHasLetterHint(letter, guess));
+            Assert.False(WordleScoring.WordleHasLetterHint(letter, guess));
         }
     }
 }

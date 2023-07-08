@@ -9,12 +9,11 @@ namespace Wordlebot
 {
     internal class Program
     {
-        static List<string> Words = new();
-
         private static bool ResultOnly = false;
         private static string StartingWord = "";
         private static string Wordle = "";
         private static string WordListFile = "";
+        private static WordleWordList? WordList;
 
         static void Main(string[] args)
         {
@@ -25,17 +24,6 @@ namespace Wordlebot
                 Environment.Exit(Constants.EXIT_INVALID_ARGS);
             }
 
-            try
-            {
-                var wordlist = new WordList(WordListFile);
-                Words = wordlist.Words;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return;
-            }
-
             string loggingLevel = "normal";
             if (ResultOnly)
             {
@@ -43,7 +31,17 @@ namespace Wordlebot
             }
             var logger = new FileLogger(loggingLevel);
 
-            var game = new WordleGame(logger, Words, StartingWord, Wordle, ResultOnly);
+            try
+            {
+                WordList = new WordleWordList(WordListFile, logger);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return;
+            }
+
+            var game = new WordleGame(logger, WordList, StartingWord, Wordle, ResultOnly);
             var result = game.PlayWordle();
 
             Console.WriteLine(result);
