@@ -36,9 +36,7 @@ namespace Wordlebot.Tests
         [InlineData(5, "error")]
         public void GetTileScoreDescription(int input, string expected)
         {
-            var logger = new FileLogger("quiet");
-            var score = new Scoring(logger);
-            string result = score.GetTileScoreDescription(input);
+            string result = Scoring.GetTileScoreDescription(input);
 
             Assert.True(result == expected, $"{result} should be {expected}");
         }

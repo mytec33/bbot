@@ -5,7 +5,7 @@ namespace Wordlebot
 {
     public class Scoring
     {
-        private ILogger _Logger { get; init; }
+        private ILogger Logger { get; init; }
 
         public const int MARK_MATCH = 2;
         public const int MARK_HINT = 1;
@@ -14,7 +14,7 @@ namespace Wordlebot
 
         public Scoring(ILogger fileLogger)
         {
-            _Logger = fileLogger;
+            Logger = fileLogger;
         }
 
         private void ResetMarks()
@@ -37,7 +37,7 @@ namespace Wordlebot
             return marks.All(mark => mark == MARK_MATCH || mark == MARK_HINT);
         }
 
-        public string GetTileScoreDescription(int score) =>
+        public static string GetTileScoreDescription(int score) =>
             score switch
             {
                 0 => "miss",
@@ -104,24 +104,24 @@ namespace Wordlebot
 
                         if (marks[x] == 2)
                         {
-                            _Logger.WriteLine($"\tLetter '{guess[x]}' exact match");
+                            Logger.WriteLine($"\tLetter '{guess[x]}' exact match");
                         }
                         else if (foundCount == occurrences && marks[x] == 2)
                         {
-                            _Logger.WriteLine($"\tLetter '{guess[x]}' exact match");
+                            Logger.WriteLine($"\tLetter '{guess[x]}' exact match");
                         }
                         else if (foundCount < occurrences && marks[x] != 2)
                         {
-                            _Logger.WriteLine($"\tLetter '{guess[x]}' hint match");
+                            Logger.WriteLine($"\tLetter '{guess[x]}' hint match");
                             marks[x] = 1;
                         }
                         else
                         {
-                            _Logger.WriteLine($"\tLetter '{guess[x]}' is an unused match");
+                            Logger.WriteLine($"\tLetter '{guess[x]}' is an unused match");
                             marks[x] = 4;
                         }
 
-                        _Logger.WriteLine($"Occurances of '{guess[x]}' is {occurrences} / {foundCount}");
+                        Logger.WriteLine($"Occurances of '{guess[x]}' is {occurrences} / {foundCount}");
                     }
                     else
                         marks[x] = 1;
@@ -136,8 +136,8 @@ namespace Wordlebot
             string greenBlock = "\u001b[32m█\u001b[0m ";
             string yellowBlock = "\u001b[33;1m█\u001b[0m ";
 
-            StringBuilder tiles = new StringBuilder();
-            StringBuilder values = new StringBuilder();
+            var tiles = new StringBuilder();
+            var values = new StringBuilder();
 
             foreach (int m in marks)
             {
@@ -157,8 +157,8 @@ namespace Wordlebot
                 values.Append($"{m} ");
             }
 
-            _Logger.WriteLine(tiles.ToString());
-            _Logger.WriteLine(values.ToString());
+            Logger.WriteLine(tiles.ToString());
+            Logger.WriteLine(values.ToString());
         }
     }
 }
