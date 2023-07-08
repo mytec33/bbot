@@ -22,7 +22,7 @@ namespace Wordlebot
             if (processedArgsResult != "")
             {
                 PrintUsage(processedArgsResult);
-                Environment.Exit(1);
+                Environment.Exit(Constants.EXIT_INVALID_ARGS);
             }
 
             try

@@ -20,14 +20,6 @@ namespace Wordlebot
         static readonly List<char> FrequentLetters = new() { 't', 's', 'r', 'e', 'a', 'i', 'c', 'n', 'l' };
         static List<string> Words = new();
 
-        private static readonly int MISS_MARKER = 0;
-        private static readonly int HINT_MARKER = 1;
-        private static readonly int MATCH_MARKER = 2;
-        private static readonly int HINT_UNUSED = 3;
-        private static readonly int MATCH_UNUSED = 4;
-
-        private static readonly int MAX_GUESSES = 6;
-
         public WordleGame(ILogger logger, List<string> words, string startingWord, string wordle, bool resultsOnly)
         {
             Logger = logger;
@@ -46,7 +38,7 @@ namespace Wordlebot
             int attempts = 1;
             string? guess;
             var marks = new Scoring(Logger);
-            while (attempts <= MAX_GUESSES)
+            while (attempts <= Constants.GAME_MAX_GUESSES)
             {
                 if (attempts == 1)
                 {
@@ -75,7 +67,7 @@ namespace Wordlebot
                         return $"You found the wordle in {attempts} tries!";
                     }
                 }
-                else if (attempts == MAX_GUESSES)
+                else if (attempts == Constants.GAME_MAX_GUESSES)
                 {
                     return $"You didn't find the Wordle. The Wordle is: {Wordle}.";
                 }
@@ -92,12 +84,12 @@ namespace Wordlebot
                     int score = marks.GetTileScore(x);
                     string action = Scoring.GetTileScoreDescription(score);
 
-                    if (score == MISS_MARKER)
+                    if (score == Constants.SCORE_NOT_IN_WORD)
                     {
                         Logger.WriteLine($"\t{guess[x]} is a {action}. Removing from all words");
                         Words = WordList.RemoveWordsWithLetter(guess[x], Words);
                     }
-                    else if (score == HINT_MARKER || score == MATCH_UNUSED)
+                    else if (score == Constants.SCORE_HINT || score == Constants.SCORE_MATCH_UNUSED)
                     {
                         Logger.WriteLine($"\t{guess[x]} is a {action}. Removing from all words with this letter in this spot: {x + 1}");
 
@@ -106,12 +98,12 @@ namespace Wordlebot
                         Words = WordList.RemoveWordsWithLetterByIndex(x, guess[x], Words);
                         Words = WordList.RemoveWordsWithoutLetter(guess[x], Words);
                     }
-                    else if (score == MATCH_MARKER)
+                    else if (score == Constants.SCORE_MATCH)
                     {
                         Logger.WriteLine($"\t{guess[x]} is a {action}. Removing from all words without this letter in this spot: {x + 1}");
                         Words = WordList.RemoveWordsWithoutLetterByIndex(x, guess[x], Words);
                     }
-                    else if (score == HINT_UNUSED)
+                    else if (score == Constants.SCORE_HINT_UNUSED)
                     {
                         Logger.WriteLine("\tHINT_USED hit");
                     }

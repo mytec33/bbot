@@ -2,7 +2,7 @@ namespace Wordlebot
 {
     public class FileLogger : ILogger
     {
-        private string Level = "";
+        private readonly string Level = "";
 
         public FileLogger(string level)
         {

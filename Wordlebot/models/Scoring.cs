@@ -7,9 +7,6 @@ namespace Wordlebot
     {
         private ILogger Logger { get; init; }
 
-        public const int MARK_MATCH = 2;
-        public const int MARK_HINT = 1;
-
         public int[] marks = new int[5] { 0, 0, 0, 0, 0 };
 
         public Scoring(ILogger fileLogger)
@@ -34,7 +31,7 @@ namespace Wordlebot
 
         public bool NoMisses()
         {
-            return marks.All(mark => mark == MARK_MATCH || mark == MARK_HINT);
+            return marks.All(mark => mark == Constants.SCORE_MATCH || mark == Constants.SCORE_HINT);
         }
 
         public static string GetTileScoreDescription(int score) =>
