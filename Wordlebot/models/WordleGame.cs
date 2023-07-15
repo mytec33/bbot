@@ -74,7 +74,7 @@ namespace Wordlebot
 
                 if (WordList.Words.Count > 1)
                 {
-                    WordList.UpdateFrequentLetters(guess);
+                    //WordList.UpdatePlayedLetters(guess);
 
                     if (scoring.NoMisses())
                     {

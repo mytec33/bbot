@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -12,7 +13,8 @@ namespace Wordlebot
         }
 
         private ILogger Logger { get; set; }
-        readonly List<char> FrequentLetters = new() { 't', 's', 'r', 'e', 'a', 'i', 'c', 'n', 'l' };
+        //readonly List<char> FrequentLetters = new() { 't', 's', 'r', 'e', 'a', 'i', 'c', 'n', 'l' };
+        private readonly List<char> PlayedLetters = new();
         public List<string> Words { get; private set; }
 
         public WordleWordList(string filename, ILogger logger)
@@ -49,6 +51,13 @@ namespace Wordlebot
                     }
                 }
             }
+
+            // For now we remove all played letters
+            // Exact matches are already part of all remaining words so we don't need to find those
+            foreach (var letter in PlayedLetters)
+            {
+                frequentLetters.Remove(letter);
+            }
             var frequentLettersList = frequentLetters.OrderByDescending(x => x.Value).ToList();
 
             foreach (KeyValuePair<char, int> kv in frequentLettersList)
@@ -74,7 +83,7 @@ namespace Wordlebot
                     sortedFrequency.Add(wordleLetter);
                 }
 
-                if (sortedFrequency.Count == 5)
+                if (sortedFrequency.Count == 12)
                 {
                     break;
                 }
@@ -82,6 +91,30 @@ namespace Wordlebot
 
             return sortedFrequency;
         }
+
+        // This needs more refinement. When we find multiple good words, how do we pick
+        // betwen what is left?
+        //private List<string> CandidateWordsByFrequency(List<WordleLetter> frequentLetters)
+        //{
+        //    var matches = new Dictionary<string, int>();
+
+        //    foreach (string word in Words)
+        //    {
+        //        matches.Add(word, 0);
+
+        //        foreach (WordleLetter letter in frequentLetters)
+        //        {
+        //            if (word.Contains(letter.Letter))
+        //            {
+        //                matches[word]++;
+        //            }
+        //        }
+        //    }
+
+        //    var sortedDict = matches.OrderByDescending(x => x.Value);
+
+        //    return sortedDict.Select(x => x.Key).ToList();
+        //}
 
         private List<string> CandidateWordsByFrequentLetters(List<WordleLetter> letters, int count)
         {
@@ -211,6 +244,11 @@ namespace Wordlebot
                 {
                     Logger.WriteLine("\tHINT_USED hit");
                 }
+
+                // Each character played adjusts the word list one way or the other. Words
+                // are either kept and present in all words (somewhere) or don't exists and
+                // no word will have them.
+                UpdatePlayedLettersByScore(guess[x]);
             }
         }
 
@@ -270,13 +308,9 @@ namespace Wordlebot
             Words.RemoveAll(item => deletes.Contains(item));
         }
 
-
-        public void UpdateFrequentLetters(string guess)
+        public void UpdatePlayedLettersByScore(char letter)
         {
-            foreach (char letter in guess)
-            {
-                FrequentLetters.Remove(letter);
-            }
+            PlayedLetters.Add(letter);
         }
 
         public void SortWordsByNoMisses(int[] marks, string guess)
@@ -311,7 +345,7 @@ namespace Wordlebot
 
         public void SortListByMisses()
         {
-            var alternateWord = new List<string>();
+            var alternateWords = new List<string>();
             var frequentLetters = AddLettersToFrequency();
 
             frequentLetters = frequentLetters.OrderByDescending(x => x.Frequency).ToList();
@@ -319,8 +353,9 @@ namespace Wordlebot
             while (frequentLetters.Count > 0)
             {
                 Logger.WriteLine($"Looking for words with {frequentLetters.Count} of {frequentLetters.Count} matches");
-                alternateWord = CandidateWordsByFrequentLetters(frequentLetters, frequentLetters.Count);
-                if (alternateWord.Count > 0)
+                alternateWords = CandidateWordsByFrequentLetters(frequentLetters, frequentLetters.Count);
+                //alternateWords = CandidateWordsByFrequency(frequentLetters);
+                if (alternateWords.Count > 0)
                 {
                     Logger.WriteLine($"Found {frequentLetters.Count} words with {frequentLetters.Count} letter matches");
                     break;
@@ -335,9 +370,9 @@ namespace Wordlebot
                 Environment.Exit(3);
             }
 
-            Logger.WriteLine($"Alternate word: {alternateWord[0]}");
-            Words.Remove(alternateWord[0]);
-            Words.Insert(0, alternateWord[0]);
+            Logger.WriteLine($"Alternate word: {alternateWords[0]}");
+            Words.Remove(alternateWords[0]);
+            Words.Insert(0, alternateWords[0]);
         }
 
     }
