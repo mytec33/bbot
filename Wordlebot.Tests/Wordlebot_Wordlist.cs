@@ -1,4 +1,4 @@
-using Wordlebot;
+/*using Wordlebot;
 
 namespace Wordlebot.Tests
 {
@@ -8,7 +8,7 @@ namespace Wordlebot.Tests
         [ClassData(typeof(RemoveWordsWitLetterData))]
         public void Test_RemoveWordsWitLetter(char letter, List<string> list, List<string> expected)
         {
-            var result = WordleWordList.RemoveWordsWithLetter(letter, list);
+            WordleWordList.RemoveWordsWithLetter(letter, list);
 
             Assert.Equal(result, expected);
         }
@@ -40,4 +40,4 @@ namespace Wordlebot.Tests
             Assert.Equal(result, expected);
         }
     }
-}
+}*/

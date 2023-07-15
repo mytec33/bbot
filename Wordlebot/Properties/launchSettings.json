@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Wordlebot": {
+      "commandName": "Project",
+      "commandLineArgs": "--wordlist-file \"C:\\Users\\mytec\\Proton Drive\\wallaire\\My files\\SourceCode\\csharp\\Wordlebot\\Wordlebot\\5_letter_words_official.txt\" --starting-word arose --wordle acrid"
+    }
+  }
+}

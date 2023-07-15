@@ -69,25 +69,10 @@ namespace Wordlebot.Tests
         }
 
         [Theory]
-        [InlineData('l', "least")]
-        [InlineData('e', "least")]
-        [InlineData('a', "least")]
-        [InlineData('s', "least")]
-        [InlineData('t', "least")]
-        public void Test_WordleHasLetterHint(char letter, string guess)
+        [ClassData(typeof(HasLetterHint))]
+        public void Test_WordleHasLetterHint(char letter, string guess, bool expected)
         {
-            Assert.True(WordleScoring.WordleHasLetterHint(letter, guess));
-        }
-
-        [Theory]
-        [InlineData('z', "least")]
-        [InlineData('y', "least")]
-        [InlineData('x', "least")]
-        [InlineData('w', "least")]
-        [InlineData('v', "least")]
-        public void Test__False_WordleHasLetterHint(char letter, string guess)
-        {
-            Assert.False(WordleScoring.WordleHasLetterHint(letter, guess));
+            Assert.Equal(WordleScoring.WordleHasLetterHint(letter, guess), expected);
         }
     }
 }

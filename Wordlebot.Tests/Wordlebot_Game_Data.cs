@@ -66,9 +66,28 @@ namespace Wordlebot.Tests
             Add("arose", "utter", "3 tries");
             Add("arose", "unzip", "4 tries");
             Add("arose", "whiff", "4 tries");
+            Add("arose", "wrong", "5 tries");
             Add("arose", "covet", "4 tries");
             Add("arose", "grand", "4 tries");
             Add("arose", "rodeo", "3 tries");
+            Add("arose", "guest", "4 tries");
+            Add("arose", "about", "3 tries");
+            Add("arose", "tract", "3 tries");
+            Add("arose", "diner", "3 tries");
+            Add("arose", "straw", "3 tries");
+            Add("arose", "bleep", "3 tries");
+            Add("arose", "mossy", "5 tries");
+            Add("arose", "hotel", "5 tries");
+            Add("arose", "irate", "6 tries");
+            Add("arose", "venom", "3 tries");
+            Add("arose", "windy", "5 tries");
+            Add("arose", "donut", "3 tries");
+            Add("arose", "cower", "6 tries");
+            Add("arose", "enter", "5 tries");
+            Add("arose", "folly", "6 tries");
+            Add("arose", "earth", "3 tries");
+            Add("arose", "whirl", "4 tries");
+            Add("arose", "crone", "4 tries");
         }
     }
 
@@ -138,9 +157,17 @@ namespace Wordlebot.Tests
             Add("crane", "utter", "3 tries");
             Add("crane", "unzip", "4 tries");
             Add("crane", "whiff", "4 tries");
+            Add("crane", "wrong", "3 tries");
             Add("crane", "covet", "3 tries");
             Add("crane", "grand", "3 tries");
             Add("crane", "rodeo", "3 tries");
+            Add("crane", "guest", "4 tries");
+            Add("crane", "about", "3 tries");
+            Add("crane", "tract", "3 tries");
+            Add("crane", "diner", "4 tries");
+            Add("crane", "straw", "3 tries");
+            Add("crane", "bleep", "4 tries");
+            Add("crane", "mossy", "5 tries");
         }
     }
 
@@ -210,9 +237,17 @@ namespace Wordlebot.Tests
             Add("magic", "utter", "3 tries");
             Add("magic", "unzip", "3 tries");
             Add("magic", "whiff", "4 tries");
+            Add("magic", "wrong", "4 tries");
             Add("magic", "covet", "6 tries");
             Add("magic", "grand", "4 tries");
             Add("magic", "rodeo", "4 tries");
+            Add("magic", "guest", "4 tries");
+            Add("magic", "about", "4 tries");
+            Add("magic", "tract", "5 tries");
+            Add("magic", "diner", "5 tries");
+            Add("magic", "straw", "3 tries");
+            Add("magic", "bleep", "4 tries");
+            Add("magic", "mossy", "3 tries");
         }
     }
 }

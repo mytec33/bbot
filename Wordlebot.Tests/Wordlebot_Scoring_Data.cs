@@ -41,6 +41,24 @@ namespace Wordlebot.Tests
         }
     }
 
+    public class HasLetterHint : TheoryData<string, string, bool>
+    {
+        public HasLetterHint()
+        {
+            Add("l", "least", true);
+            Add("e", "least", true);
+            Add("a", "least", true);
+            Add("s", "least", true);
+            Add("t", "least", true);
+
+            Add("v", "cower", false);
+            Add("w", "crane", false);
+            Add("x", "donut", false);
+            Add("y", "geese", false);
+            Add("z", "hutch", false);
+        }
+    }
+
     public class ScoreWordTestData : TheoryData<string, string, string>
     {
         public ScoreWordTestData()
@@ -61,12 +79,12 @@ namespace Wordlebot.Tests
             Add("crane", "crane", "22222");
             Add("kneel", "kneel", "22222");
             Add("nanny", "nanny", "22222");
-            
+
             // Mixed
             Add("arose", "bagel", "10001");
             Add("arose", "brass", "12020");
             Add("slate", "stale", "21212");
-            
+
             // Mixed with unused match
             Add("ditto", "slate", "00420");
 
@@ -92,7 +110,7 @@ namespace Wordlebot.Tests
             Add("tread", "hater", "11110");
             // TODO: Bingo! This is the missing part of my scoring. Should be 00142 (unused hint)
             // NY Times scores as blank, blank, hint, blank, match
-            Add("flood", "hound", "00112"); 
+            Add("flood", "hound", "00112");
             Add("fleck", "kneel", "01201");
             Add("sheep", "kneel", "00220");
             Add("slate", "kneel", "01001");

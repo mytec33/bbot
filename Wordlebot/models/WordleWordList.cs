@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 
 namespace Wordlebot
@@ -11,7 +12,7 @@ namespace Wordlebot
         }
 
         private ILogger Logger { get; set; }
-        static readonly List<char> FrequentLetters = new() { 't', 's', 'r', 'e', 'a', 'i', 'c', 'n', 'l' };
+        readonly List<char> FrequentLetters = new() { 't', 's', 'r', 'e', 'a', 'i', 'c', 'n', 'l' };
         public List<string> Words { get; private set; }
 
         public WordleWordList(string filename, ILogger logger)
@@ -20,13 +21,13 @@ namespace Wordlebot
             Logger = logger;
         }
 
-        private static List<WordleLetter> AddLettersToFrequency(List<string> wordList)
+        private List<WordleLetter> AddLettersToFrequency()
         {
             var foundLetters = new List<char>();
             var frequentLetters = new Dictionary<char, int>();
             var sortedFrequency = new List<WordleLetter>();
 
-            foreach (string word in wordList)
+            foreach (string word in Words)
             {
                 foundLetters.Clear();
                 foreach (char letter in word)
@@ -82,11 +83,11 @@ namespace Wordlebot
             return sortedFrequency;
         }
 
-        private static List<string> CandidateWordsByFrequentLetters(List<string> localWords, List<WordleLetter> letters, int count)
+        private List<string> CandidateWordsByFrequentLetters(List<WordleLetter> letters, int count)
         {
             var matchedWords = new List<string>();
 
-            foreach (string word in localWords)
+            foreach (string word in Words)
             {
                 int counter = 0;
                 foreach (WordleLetter l in letters)
@@ -106,11 +107,11 @@ namespace Wordlebot
             return matchedWords;
         }
 
-        private static List<string> CandidateWordsByKnownLetters(List<string> localWords, List<char> letters)
+        private List<string> CandidateWordsByKnownLetters(List<char> letters)
         {
             var matchedWords = new List<string>();
 
-            foreach (string word in localWords)
+            foreach (string word in Words)
             {
                 int counter = 0;
                 foreach (char letter in word)
@@ -133,13 +134,13 @@ namespace Wordlebot
             return matchedWords;
         }
 
-        public static void PrintWorldList(List<string> list, ILogger logger)
+        public void PrintWorldList()
         {
             int count = 1;
             var words = new StringBuilder();
 
             words.Append('\t');
-            foreach (string word in list)
+            foreach (string word in Words)
             {
                 words.Append($"{word} ");
 
@@ -153,7 +154,64 @@ namespace Wordlebot
                 count++;
             }
 
-            logger.WriteLine(words.ToString());
+            Logger.WriteLine(words.ToString());
+        }
+
+        public void PrintWordList(List<string> wordList)
+        {
+            int count = 1;
+            var words = new StringBuilder();
+
+            words.Append('\t');
+            foreach (string word in wordList)
+            {
+                words.Append($"{word} ");
+
+                if (count % 20 == 0)
+                {
+                    words.Append('\n');
+                    words.Append('\t');
+                    count = 0;
+                }
+
+                count++;
+            }
+
+            Logger.WriteLine(words.ToString());
+        }
+
+        public void ReduceWordsBaseOnScore(WordleScoring score, string guess)
+        {
+            // Work through each tile based on current score
+            for (int x = 0; x < 5; x++)
+            {
+                int tileScore = score.GetTileScore(x);
+                string action = WordleScoring.GetTileScoreDescription(tileScore);
+
+                if (tileScore == Constants.SCORE_NOT_IN_WORD)
+                {
+                    Logger.WriteLine($"\t{guess[x]} is a {action}. Removing from all words");
+                    RemoveWordsWithLetter(guess[x]);
+                }
+                else if (tileScore == Constants.SCORE_HINT || tileScore == Constants.SCORE_MATCH_UNUSED)
+                {
+                    Logger.WriteLine($"\t{guess[x]} is a {action}. Removing from all words with this letter in this spot: {x + 1}");
+
+                    // Word cannot have hint in this spot, so remove those before we try to find words
+                    // with hint elsewhere otherwise this spot will be a false positive
+                    RemoveWordsWithLetterByIndex(x, guess[x]);
+                    RemoveWordsWithoutLetter(guess[x]);
+                }
+                else if (tileScore == Constants.SCORE_MATCH)
+                {
+                    Logger.WriteLine($"\t{guess[x]} is a {action}. Removing from all words without this letter in this spot: {x + 1}");
+                    RemoveWordsWithoutLetterByIndex(x, guess[x]);
+                }
+                else if (tileScore == Constants.SCORE_HINT_UNUSED)
+                {
+                    Logger.WriteLine("\tHINT_USED hit");
+                }
+            }
         }
 
         private static List<string> ReadWordList(string path)
@@ -189,39 +247,31 @@ namespace Wordlebot
             return list;
         }
 
-        static public List<string> RemoveWordsWithLetter(char letter, List<string> list)
+        public void RemoveWordsWithLetter(char letter)
         {
-            var deletes = list.Where(word => word.Contains(letter)).ToList();
-            list.RemoveAll(item => deletes.Contains(item));
-
-            return list;
+            var deletes = Words.Where(word => word.Contains(letter)).ToList();
+            Words.RemoveAll(item => deletes.Contains(item));
         }
 
-        static public List<string> RemoveWordsWithLetterByIndex(int index, char letter, List<string> list)
+        public void RemoveWordsWithLetterByIndex(int index, char letter)
         {
-            var deletes = list.Where(word => word[index] == letter).ToList();
-            list.RemoveAll(item => deletes.Contains(item));
-
-            return list;
+            var deletes = Words.Where(word => word[index] == letter).ToList();
+            Words.RemoveAll(item => deletes.Contains(item));
         }
 
-        static public List<string> RemoveWordsWithoutLetter(char letter, List<string> list)
+        public void RemoveWordsWithoutLetter(char letter)
         {
-            var keepers = list.Where(word => word.Any(c => c == letter)).ToList();
-
-            return keepers;
+            Words = Words.Where(word => word.Any(c => c == letter)).ToList();
         }
 
-        static public List<string> RemoveWordsWithoutLetterByIndex(int index, char letter, List<string> list)
+        public void RemoveWordsWithoutLetterByIndex(int index, char letter)
         {
-            var deletes = list.Where(word => word[index] != letter).ToList();
-            list.RemoveAll(item => deletes.Contains(item));
-
-            return list;
+            var deletes = Words.Where(word => word[index] != letter).ToList();
+            Words.RemoveAll(item => deletes.Contains(item));
         }
 
 
-        public static void RemoveFrequentLettersByGuess(string guess)
+        public void UpdateFrequentLetters(string guess)
         {
             foreach (char letter in guess)
             {
@@ -229,7 +279,7 @@ namespace Wordlebot
             }
         }
 
-        public List<string> SortWordsByNoMisses(int[] marks, string guess, List<string> wordList)
+        public void SortWordsByNoMisses(int[] marks, string guess)
         {
             var hints = new List<char>();
 
@@ -245,7 +295,7 @@ namespace Wordlebot
             var matchedWords = new List<string>();
             while (count > 0)
             {
-                matchedWords = CandidateWordsByKnownLetters(wordList, hints);
+                matchedWords = CandidateWordsByKnownLetters(hints);
 
                 if (matchedWords.Count > 0)
                 {
@@ -256,46 +306,38 @@ namespace Wordlebot
                 count--;
             }
 
-            return matchedWords;
+            Words = matchedWords;
         }
 
-        public List<string> SortListByMisses(List<string> wordList)
+        public void SortListByMisses()
         {
-            var frequentLetters = new List<char>();
-            var frequentLetters2 = new List<WordleLetter>();
+            var alternateWord = new List<string>();
+            var frequentLetters = AddLettersToFrequency();
 
-            var sortedFrequency = AddLettersToFrequency(wordList);
-            sortedFrequency = sortedFrequency.OrderByDescending(x => x.Frequency).ToList();
+            frequentLetters = frequentLetters.OrderByDescending(x => x.Frequency).ToList();
 
-            int count = sortedFrequency.Count;
-            var matchedWords = new List<string>();
-            while (count > 0)
+            while (frequentLetters.Count > 0)
             {
-                Logger.WriteLine($"Looking for words with {count} of {sortedFrequency.Count} matches");
-                matchedWords = CandidateWordsByFrequentLetters(wordList, sortedFrequency, count);
-                if (matchedWords.Count > 0)
+                Logger.WriteLine($"Looking for words with {frequentLetters.Count} of {frequentLetters.Count} matches");
+                alternateWord = CandidateWordsByFrequentLetters(frequentLetters, frequentLetters.Count);
+                if (alternateWord.Count > 0)
                 {
-                    Logger.WriteLine($"Found words with {count} of {sortedFrequency.Count} matches");
+                    Logger.WriteLine($"Found {frequentLetters.Count} words with {frequentLetters.Count} letter matches");
                     break;
                 }
 
-                sortedFrequency.Remove(sortedFrequency.Last());
-                count--;
+                frequentLetters.Remove(frequentLetters.Last());
             }
 
-            if (matchedWords.Count < 1)
+            if (Words.Count < 1)
             {
                 Logger.WriteLine("No candidate words found. Quitting.");
                 Environment.Exit(3);
             }
 
-            var alternateWord = matchedWords[0];
-            Logger.WriteLine($"Alternate word: {alternateWord}");
-
-            wordList.Remove(alternateWord);
-            wordList.Insert(0, alternateWord);
-
-            return wordList;
+            Logger.WriteLine($"Alternate word: {alternateWord[0]}");
+            Words.Remove(alternateWord[0]);
+            Words.Insert(0, alternateWord[0]);
         }
 
     }

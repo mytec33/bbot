@@ -6,27 +6,25 @@ namespace Wordlebot
     public class WordleGame
     {
         static bool ResultOnly = false;
-        static string StartingWord = "";
+        static string FirstGuess = "";
         static string Wordle = "";
 
         private ILogger Logger { get; init; }
-        static List<string> Words = new();
         private readonly WordleWordList WordList;
 
         public WordleGame(ILogger logger, WordleWordList wordList, string startingWord, string wordle, bool resultsOnly)
         {
             Logger = logger;
             ResultOnly = resultsOnly;
-            StartingWord = startingWord;
+            FirstGuess = startingWord;
             Wordle = wordle;
-            Words = wordList.Words;
             WordList = wordList;
         }
 
         public string PlayWordle()
         {
-            Logger.WriteLine($"Words: {Words.Count:#,##0}");
-            Logger.WriteLine($"First word: {StartingWord}");
+            Logger.WriteLine($"Words: {WordList.Words.Count:#,##0}");
+            Logger.WriteLine($"First guess: {FirstGuess}");
             Logger.WriteLine($"Wordle: {Wordle}\n");
 
             int attempts = 1;
@@ -37,7 +35,7 @@ namespace Wordlebot
             {
                 if (attempts == 1)
                 {
-                    guess = StartingWord;
+                    guess = FirstGuess;
                 }
                 else
                 {
@@ -45,9 +43,8 @@ namespace Wordlebot
                     // than picking first.
                     //ReduceSet(Words);
 
-                    guess = Words[0];
+                    guess = WordList.Words[0];
                 }
-                WordleWordList.RemoveFrequentLettersByGuess(guess);
 
                 Logger.WriteLine($"Guess {attempts}: {guess}");
 
@@ -71,51 +68,23 @@ namespace Wordlebot
                 scoring.ScoreWord(guess, Wordle);
                 scoring.PrintMarks();
 
-                // Work through each tile based on current score
-                for (int x = 0; x < 5; x++)
+                WordList.ReduceWordsBaseOnScore(scoring, guess);
+                Logger.WriteLine($"Found {WordList.Words.Count:#,##0} potential words:");
+                WordList.PrintWorldList();
+
+                if (WordList.Words.Count > 1)
                 {
-                    Logger.WriteLine($"Tile: {x + 1}");
+                    WordList.UpdateFrequentLetters(guess);
 
-                    int score = scoring.GetTileScore(x);
-                    string action = WordleScoring.GetTileScoreDescription(score);
-
-                    if (score == Constants.SCORE_NOT_IN_WORD)
-                    {
-                        Logger.WriteLine($"\t{guess[x]} is a {action}. Removing from all words");
-                        Words = WordleWordList.RemoveWordsWithLetter(guess[x], Words);
-                    }
-                    else if (score == Constants.SCORE_HINT || score == Constants.SCORE_MATCH_UNUSED)
-                    {
-                        Logger.WriteLine($"\t{guess[x]} is a {action}. Removing from all words with this letter in this spot: {x + 1}");
-
-                        // Word cannot have hint in this spot, so remove those before we try to find words
-                        // with hint elsewhere otherwise this spot will be a false positive
-                        Words = WordleWordList.RemoveWordsWithLetterByIndex(x, guess[x], Words);
-                        Words = WordleWordList.RemoveWordsWithoutLetter(guess[x], Words);
-                    }
-                    else if (score == Constants.SCORE_MATCH)
-                    {
-                        Logger.WriteLine($"\t{guess[x]} is a {action}. Removing from all words without this letter in this spot: {x + 1}");
-                        Words = WordleWordList.RemoveWordsWithoutLetterByIndex(x, guess[x], Words);
-                    }
-                    else if (score == Constants.SCORE_HINT_UNUSED)
-                    {
-                        Logger.WriteLine("\tHINT_USED hit");
-                    }
-                }
-
-                Logger.WriteLine($"Found {Words.Count:#,##0} potential words");
-                WordleWordList.PrintWorldList(Words, Logger);
-
-                if (Words.Count > 1)
-                {
                     if (scoring.NoMisses())
                     {
-                        Words = WordList.SortWordsByNoMisses(scoring.marks, guess, Words);
+                        Logger.WriteLine("Scoring no misses");
+                        WordList.SortWordsByNoMisses(scoring.marks, guess);
                     }
                     else
                     {
-                        Words = WordList.SortListByMisses(Words);
+                        Logger.WriteLine("Scoring with misses");
+                        WordList.SortListByMisses();
                     }
                 }
 
@@ -123,7 +92,7 @@ namespace Wordlebot
                 {
                     return "null";
                 }
-                if (Words.Count < 1)
+                if (WordList.Words.Count < 1)
                 {
                     return "No words remaining";
                 }
