@@ -1,4 +1,4 @@
-/*using Wordlebot;
+using Wordlebot;
 
 namespace Wordlebot.Tests
 {
@@ -8,36 +8,48 @@ namespace Wordlebot.Tests
         [ClassData(typeof(RemoveWordsWitLetterData))]
         public void Test_RemoveWordsWitLetter(char letter, List<string> list, List<string> expected)
         {
-            WordleWordList.RemoveWordsWithLetter(letter, list);
+            var consoleLogger = new ConsoleLogger("quiet");
+            var wordList = new WordleWordList(list, consoleLogger);
+           
+            wordList.RemoveWordsWithLetter(letter);
 
-            Assert.Equal(result, expected);
+            Assert.Equal(wordList.Words, expected);
         }
 
         [Theory]
         [ClassData(typeof(RemoveWordsWithLetterByIndexData))]
         public void Test_RemoveWordsWithLetterByIndex(int index, char letter, List<string> list, List<string> expected)
         {
-            var result = WordleWordList.RemoveWordsWithLetterByIndex(index, letter, list);
+            var consoleLogger = new ConsoleLogger("quiet");
+            var wordList = new WordleWordList(list, consoleLogger);
 
-            Assert.Equal(result, expected);
+            wordList.RemoveWordsWithLetterByIndex(index, letter);
+
+            Assert.Equal(wordList.Words, expected);
         }
 
         [Theory]
         [ClassData(typeof(RemoveWordsWithoutLetterData))]
         public void Test_RemoveWordsWithoutLetter(char letter, List<string> list, List<string> expected)
         {
-            var result = WordleWordList.RemoveWordsWithoutLetter(letter, list);
+            var consoleLogger = new ConsoleLogger("quiet");
+            var wordList = new WordleWordList(list, consoleLogger);
 
-            Assert.Equal(result, expected);
+            wordList.RemoveWordsWithoutLetter(letter);
+
+            Assert.Equal(wordList.Words, expected);
         }
 
         [Theory]
         [ClassData(typeof(RemoveWordsWithoutLetterByIndexData))]
         public void Test_RemoveWordsWithoutLetterByIndex(int index, char letter, List<string> list, List<string> expected)
         {
-            var result = WordleWordList.RemoveWordsWithoutLetterByIndex(index, letter, list);
+            var consoleLogger = new ConsoleLogger("quiet");
+            var wordList = new WordleWordList(list, consoleLogger);
 
-            Assert.Equal(result, expected);
+            wordList.RemoveWordsWithoutLetterByIndex(index, letter);
+
+            Assert.Equal(wordList.Words, expected);
         }
     }
-}*/
+}

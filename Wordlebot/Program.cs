@@ -29,7 +29,7 @@ namespace Wordlebot
             {
                 loggingLevel = "quiet";
             }
-            var logger = new FileLogger(loggingLevel);
+            var logger = new ConsoleLogger(loggingLevel);
 
             try
             {

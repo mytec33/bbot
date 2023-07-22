@@ -23,6 +23,12 @@ namespace Wordlebot
             Logger = logger;
         }
 
+        public WordleWordList(List<string> list, ILogger logger)
+        {
+            Words = list;
+            Logger = logger;
+        }
+
         private List<WordleLetter> AddLettersToFrequency()
         {
             var foundLetters = new List<char>();
