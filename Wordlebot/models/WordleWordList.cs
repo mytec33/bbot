@@ -196,29 +196,6 @@ namespace Wordlebot
             Logger.WriteLine(words.ToString());
         }
 
-        public void PrintWordList(List<string> wordList)
-        {
-            int count = 1;
-            var words = new StringBuilder();
-
-            words.Append('\t');
-            foreach (string word in wordList)
-            {
-                words.Append($"{word} ");
-
-                if (count % 20 == 0)
-                {
-                    words.Append('\n');
-                    words.Append('\t');
-                    count = 0;
-                }
-
-                count++;
-            }
-
-            Logger.WriteLine(words.ToString());
-        }
-
         public void ReduceWordsBaseOnScore(WordleScoring score, string guess)
         {
             // Work through each tile based on current score
