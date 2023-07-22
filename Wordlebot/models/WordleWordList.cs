@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Wordlebot
@@ -13,7 +11,6 @@ namespace Wordlebot
         }
 
         private ILogger Logger { get; set; }
-        //readonly List<char> FrequentLetters = new() { 't', 's', 'r', 'e', 'a', 'i', 'c', 'n', 'l' };
         private readonly List<char> PlayedLetters = new();
         public List<string> Words { get; private set; }
 
@@ -294,36 +291,6 @@ namespace Wordlebot
         public void UpdatePlayedLettersByScore(char letter)
         {
             PlayedLetters.Add(letter);
-        }
-
-        public void SortWordsByNoMisses(int[] marks, string guess)
-        {
-            var hints = new List<char>();
-
-            for (int x = 0; x < 5; x++)
-            {
-                if (marks[x] == 1)
-                {
-                    hints.Add(guess[x]);
-                }
-            }
-
-            int count = hints.Count;
-            var matchedWords = new List<string>();
-            while (count > 0)
-            {
-                matchedWords = CandidateWordsByKnownLetters(hints);
-
-                if (matchedWords.Count > 0)
-                {
-                    Logger.WriteLine($"Found words with {count} of {hints.Count} matches");
-                    break;
-                }
-
-                count--;
-            }
-
-            Words = matchedWords;
         }
 
         public void SortListByMisses()

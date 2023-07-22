@@ -39,10 +39,6 @@ namespace Wordlebot
                 }
                 else
                 {
-                    // TODO: if more than one item, this should have some heuristic rather
-                    // than picking first.
-                    //ReduceSet(Words);
-
                     guess = WordList.Words[0];
                 }
 
@@ -74,27 +70,17 @@ namespace Wordlebot
 
                 if (WordList.Words.Count > 1)
                 {
-                    //WordList.UpdatePlayedLetters(guess);
-
-                    if (scoring.NoMisses())
-                    {
-                        Logger.WriteLine("Scoring no misses");
-                        WordList.SortWordsByNoMisses(scoring.marks, guess);
-                    }
-                    else
-                    {
-                        Logger.WriteLine("Scoring with misses");
-                        WordList.SortListByMisses();
-                    }
+                    Logger.WriteLine("Scoring with misses");
+                    WordList.SortListByMisses();
+                }
+                else if (WordList.Words.Count < 1)
+                {
+                    return "No words remaining";
                 }
 
                 if (guess == null)
                 {
                     return "null";
-                }
-                if (WordList.Words.Count < 1)
-                {
-                    return "No words remaining";
                 }
 
                 attempts++;
