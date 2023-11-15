@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/Wordlebot.csproj"
+                "${workspaceFolder}/Wordlebot/Wordlebot.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

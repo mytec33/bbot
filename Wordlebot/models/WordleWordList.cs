@@ -95,30 +95,6 @@ namespace Wordlebot
             return sortedFrequency;
         }
 
-        // This needs more refinement. When we find multiple good words, how do we pick
-        // betwen what is left?
-        //private List<string> CandidateWordsByFrequency(List<WordleLetter> frequentLetters)
-        //{
-        //    var matches = new Dictionary<string, int>();
-
-        //    foreach (string word in Words)
-        //    {
-        //        matches.Add(word, 0);
-
-        //        foreach (WordleLetter letter in frequentLetters)
-        //        {
-        //            if (word.Contains(letter.Letter))
-        //            {
-        //                matches[word]++;
-        //            }
-        //        }
-        //    }
-
-        //    var sortedDict = matches.OrderByDescending(x => x.Value);
-
-        //    return sortedDict.Select(x => x.Key).ToList();
-        //}
-
         private List<string> CandidateWordsByFrequentLetters(List<WordleLetter> letters, int count)
         {
             var matchedWords = new List<string>();
@@ -135,33 +111,6 @@ namespace Wordlebot
                 }
 
                 if (counter >= count)
-                {
-                    matchedWords.Add(word);
-                }
-            }
-
-            return matchedWords;
-        }
-
-        private List<string> CandidateWordsByKnownLetters(List<char> letters)
-        {
-            var matchedWords = new List<string>();
-
-            foreach (string word in Words)
-            {
-                int counter = 0;
-                foreach (char letter in word)
-                {
-                    foreach (char l in letters)
-                    {
-                        if (letter == l)
-                        {
-                            counter++;
-                        }
-                    }
-                }
-
-                if (counter >= letters.Count)
                 {
                     matchedWords.Add(word);
                 }

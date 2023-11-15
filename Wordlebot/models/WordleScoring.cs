@@ -6,7 +6,7 @@ namespace Wordlebot
     {
         private ILogger Logger { get; init; }
 
-        public int[] marks = new int[5] { 0, 0, 0, 0, 0 };
+        public int[] marks = new int[5] { 0, 0, 0, 0, 0};
 
         public WordleScoring(ILogger fileLogger)
         {

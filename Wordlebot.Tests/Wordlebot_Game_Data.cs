@@ -88,6 +88,15 @@ namespace Wordlebot.Tests
             Add("arose", "earth", "3 tries");
             Add("arose", "whirl", "4 tries");
             Add("arose", "crone", "4 tries");
+            Add("arose", "topaz", "4 tries");
+            Add("arose", "droop", "4 tries");
+            Add("arose", "flyer", "5 tries");
+            Add("arose", "tonic", "3 tries");
+            Add("arose", "flank", "4 tries");
+            Add("arose", "burly", "3 tries");
+            Add("arose", "froze", "5 tries");
+            Add("arose", "whale", "3 tries");
+            Add("arose", "hobby", "5 tries");
         }
     }
 
@@ -168,6 +177,26 @@ namespace Wordlebot.Tests
             Add("crane", "straw", "3 tries");
             Add("crane", "bleep", "4 tries");
             Add("crane", "mossy", "5 tries");
+            Add("crane", "hotel", "5 tries");
+            Add("crane", "irate", "5 tries");
+            Add("crane", "venom", "3 tries");
+            Add("crane", "windy", "6 tries");
+            Add("crane", "donut", "4 tries");
+            Add("crane", "cower", "3 tries");
+            Add("crane", "enter", "3 tries");
+            Add("crane", "folly", "5 tries");
+            Add("crane", "earth", "4 tries");
+            Add("crane", "whirl", "3 tries");
+            Add("crane", "crone", "2 tries");
+            Add("crane", "topaz", "4 tries");
+            Add("crane", "droop", "3 tries");
+            Add("crane", "flyer", "4 tries");
+            Add("crane", "tonic", "4 tries");
+            Add("crane", "flank", "3 tries");
+            Add("crane", "burly", "3 tries");
+            Add("crane", "froze", "6 tries");
+            Add("crane", "whale", "3 tries");
+            Add("crane", "hobby", "5 tries");
         }
     }
 
@@ -248,6 +277,26 @@ namespace Wordlebot.Tests
             Add("magic", "straw", "3 tries");
             Add("magic", "bleep", "4 tries");
             Add("magic", "mossy", "3 tries");
+            Add("magic", "hotel", "4 tries");
+            Add("magic", "irate", "3 tries");
+            Add("magic", "venom", "3 tries");
+            Add("magic", "windy", "5 tries");
+            Add("magic", "donut", "4 tries");
+            Add("magic", "cower", "4 tries");
+            Add("magic", "enter", "4 tries");
+            Add("magic", "folly", "6 tries");
+            Add("magic", "earth", "3 tries");
+            Add("magic", "whirl", "5 tries");
+            Add("magic", "crone", "4 tries");
+            Add("magic", "topaz", "5 tries");
+            Add("magic", "droop", "5 tries");
+            Add("magic", "flyer", "5 tries");
+            Add("magic", "tonic", "2 tries");
+            Add("magic", "flank", "3 tries");
+            Add("magic", "burly", "3 tries");
+            Add("magic", "froze", "6 tries");
+            Add("magic", "whale", "4 tries");
+            Add("magic", "hobby", "5 tries");
         }
     }
 }
