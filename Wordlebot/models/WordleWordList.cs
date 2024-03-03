@@ -157,12 +157,13 @@ namespace Wordlebot
                 }
                 else if (tileScore == Constants.SCORE_HINT || tileScore == Constants.SCORE_MATCH_UNUSED)
                 {
-                    Logger.WriteLine($"\t{guess[x]} is a {action}. Removing from all words with this letter in this spot: {x + 1}");
+                    Logger.WriteLine($"\t{guess[x]} is a {action}. Removing all words with this letter in this spot: {x + 1}");
+                    Logger.WriteLine($"\t\t     Removing all words missing this letter");
 
                     // Word cannot have hint in this spot, so remove those before we try to find words
                     // with hint elsewhere otherwise this spot will be a false positive
-                    RemoveWordsWithLetterByIndex(x, guess[x]);
-                    RemoveWordsWithoutLetter(guess[x]);
+                    RemoveWordsWithLetterAtIndex(x, guess[x]);
+                    RemoveWordsMissingLetter(guess[x]);
                 }
                 else if (tileScore == Constants.SCORE_MATCH)
                 {
@@ -175,7 +176,7 @@ namespace Wordlebot
                 }
 
                 // Each character played adjusts the word list one way or the other. Words
-                // are either kept and present in all words (somewhere) or don't exists and
+                // are either kept and present in all words (somewhere) or don't exist and
                 // no word will have them.
                 UpdatePlayedLettersByScore(guess[x]);
             }
@@ -192,14 +193,7 @@ namespace Wordlebot
 
             try
             {
-                // Should load a user defined library of words
-                StreamReader sr = new(path);
-
-                string? line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    list.Add(line);
-                }
+                list.AddRange(File.ReadAllLines(path));
 
                 if (list.Count < 1)
                 {
@@ -220,13 +214,13 @@ namespace Wordlebot
             Words.RemoveAll(item => deletes.Contains(item));
         }
 
-        public void RemoveWordsWithLetterByIndex(int index, char letter)
+        public void RemoveWordsWithLetterAtIndex(int index, char letter)
         {
             var deletes = Words.Where(word => word[index] == letter).ToList();
             Words.RemoveAll(item => deletes.Contains(item));
         }
 
-        public void RemoveWordsWithoutLetter(char letter)
+        public void RemoveWordsMissingLetter(char letter)
         {
             Words = Words.Where(word => word.Any(c => c == letter)).ToList();
         }
@@ -253,7 +247,7 @@ namespace Wordlebot
             {
                 Logger.WriteLine($"Looking for words with {frequentLetters.Count} of {frequentLetters.Count} matches");
                 alternateWords = CandidateWordsByFrequentLetters(frequentLetters, frequentLetters.Count);
-                //alternateWords = CandidateWordsByFrequency(frequentLetters);
+ 
                 if (alternateWords.Count > 0)
                 {
                     Logger.WriteLine($"Found {frequentLetters.Count} words with {frequentLetters.Count} letter matches");

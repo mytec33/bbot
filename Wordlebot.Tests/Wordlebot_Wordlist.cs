@@ -23,7 +23,7 @@ namespace Wordlebot.Tests
             var consoleLogger = new ConsoleLogger("quiet");
             var wordList = new WordleWordList(list, consoleLogger);
 
-            wordList.RemoveWordsWithLetterByIndex(index, letter);
+            wordList.RemoveWordsWithLetterAtIndex(index, letter);
 
             Assert.Equal(wordList.Words, expected);
         }
@@ -35,7 +35,7 @@ namespace Wordlebot.Tests
             var consoleLogger = new ConsoleLogger("quiet");
             var wordList = new WordleWordList(list, consoleLogger);
 
-            wordList.RemoveWordsWithoutLetter(letter);
+            wordList.RemoveWordsMissingLetter(letter);
 
             Assert.Equal(wordList.Words, expected);
         }
