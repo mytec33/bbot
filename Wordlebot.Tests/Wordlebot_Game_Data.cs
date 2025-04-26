@@ -44,7 +44,6 @@ namespace Wordlebot.Tests
             Add("arose", "logic", "4 tries");
             Add("arose", "maybe", "5 tries");
             Add("arose", "metro", "3 tries");
-            Add("arose", "moral", "3 tries");
             Add("arose", "mouse", "2 tries");
             Add("arose", "nanny", "3 tries");
             Add("arose", "plank", "6 tries");
@@ -97,7 +96,130 @@ namespace Wordlebot.Tests
             Add("arose", "froze", "5 tries");
             Add("arose", "whale", "3 tries");
             Add("arose", "hobby", "5 tries");
+
+            // January 2025
+            Add("arose", "toast", "2 tries");
+            Add("arose", "false", "3 tries");
+            Add("arose", "udder", "4 tries");
+            Add("arose", "fever", "5 tries");
+            Add("arose", "shunt", "3 tries");
+            Add("arose", "sunny", "4 tries");
+            Add("arose", "crisp", "3 tries");
+            Add("arose", "crepe", "3 tries");
+            Add("arose", "upper", "5 tries");
+            Add("arose", "reach", "4 tries");
+            Add("arose", "icing", "4 tries");
+            Add("arose", "squid", "4 tries");
+            Add("arose", "rower", "You didn't find the Wordle. The Wordle is: rower.");
+            Add("arose", "silly", "4 tries");
+            Add("arose", "prose", "2 tries");
+            Add("arose", "flint", "4 tries");
+            Add("arose", "knack", "4 tries");
+            Add("arose", "fancy", "4 tries");
+            Add("arose", "cloak", "3 tries");
+            Add("arose", "total", "3 tries");
+            Add("arose", "dingy", "6 tries");
+            Add("arose", "crawl", "3 tries");
+            Add("arose", "wafer", "5 tries");
+            Add("arose", "draft", "4 tries");
+            Add("arose", "atlas", "2 tries");
+            Add("arose", "sprig", "4 tries");
+            Add("arose", "cyber", "4 tries");
+            Add("arose", "relax", "4 tries");
+            Add("arose", "cheap", "3 tries");
+            Add("arose", "chose", "2 tries");
+            Add("arose", "nerve", "3 tries");
+
+            // February 2025
+            Add("arose", "fuzzy", "5 tries");
+            Add("arose", "lodge", "4 tries");
+            Add("arose", "award", "3 tries");
+            Add("arose", "dryer", "3 tries");
+            Add("arose", "gland", "4 tries");
+            Add("arose", "otter", "4 tries");
+            Add("arose", "cream", "5 tries");
+            Add("arose", "clove", "3 tries");
+            Add("arose", "roach", "3 tries");
+            Add("arose", "madly", "4 tries");
+            Add("arose", "indie", "4 tries");
+            Add("arose", "trail", "3 tries");
+            Add("arose", "suave", "4 tries");
+            Add("arose", "crook", "5 tries");
+            Add("arose", "ditty", "4 tries");
+            Add("arose", "rumba", "4 tries");
+            Add("arose", "rapid", "5 tries");
+            Add("arose", "score", "2 tries");
+            Add("arose", "goody", "5 tries");
+            Add("arose", "bonus", "3 tries");
+            Add("arose", "steep", "3 tries");
+            Add("arose", "swath", "4 tries");
+            Add("arose", "pupil", "4 tries");
+            Add("arose", "pedal", "3 tries");
+            Add("arose", "tooth", "4 tries");
+            Add("arose", "revue", "3 tries");
+            Add("arose", "chore", "2 tries");
+            Add("arose", "rivet", "3 tries");
+
+            // March 2025
+            Add("arose", "booty", "3 tries");
+            Add("arose", "quota", "3 tries");
+            Add("arose", "sorry", "2 tries");
+            Add("arose", "verse", "3 tries");
+            Add("arose", "sheet", "3 tries");
+            Add("arose", "elbow", "4 tries");
+            Add("arose", "shelf", "4 tries");
+            Add("arose", "angle", "3 tries");
+            Add("arose", "dopey", "4 tries");
+            Add("arose", "amble", "4 tries");
+            Add("arose", "nudge", "4 tries");
+            Add("arose", "baste", "3 tries");
+            Add("arose", "spark", "3 tries");
+            Add("arose", "timer", "3 tries");
+            Add("arose", "lasso", "3 tries");
+            Add("arose", "stamp", "3 tries");
+            Add("arose", "ladle", "4 tries");
+            Add("arose", "piece", "4 tries");
+            Add("arose", "chase", "3 tries");
+            Add("arose", "mango", "3 tries");
+            Add("arose", "track", "4 tries");
+            Add("arose", "spite", "4 tries");
+            Add("arose", "greed", "4 tries");
+            Add("arose", "navel", "5 tries");
+            Add("arose", "troop", "3 tries");
+            Add("arose", "alert", "2 tries");
+            Add("arose", "scrum", "3 tries");
+            Add("arose", "check", "4 tries");
+            Add("arose", "spear", "4 tries");
+            Add("arose", "deity", "3 tries");
+            Add("arose", "hover", "5 tries");
+
+            // April 2025
             Add("arose", "clash", "2 tries");
+            Add("arose", "known", "4 tries");
+            Add("arose", "genie", "3 tries");
+            Add("arose", "ozone", "3 tries");
+            Add("arose", "artsy", "2 tries");
+            Add("arose", "spate", "3 tries");
+            Add("arose", "patch", "4 tries");
+            Add("arose", "inbox", "4 tries");
+            Add("arose", "dirge", "3 tries");
+            Add("arose", "stood", "6 tries");
+            Add("arose", "moral", "3 tries");
+            Add("arose", "ashen", "2 tries");
+            Add("arose", "crest", "2 tries");
+            Add("arose", "laugh", "4 tries");
+            Add("arose", "nurse", "2 tries");
+            Add("arose", "arrow", "3 tries");
+            Add("arose", "turbo", "3 tries");
+            Add("arose", "wheat", "3 tries");
+            Add("arose", "spare", "4 tries");
+            Add("arose", "hazel", "6 tries");
+            Add("arose", "villa", "4 tries");
+            Add("arose", "foamy", "4 tries");
+            Add("arose", "krill", "4 tries");
+            Add("arose", "shear", "3 tries");
+            Add("arose", "curse", "4 tries");
+            Add("arose", "jewel", "6 tries");
         }
     }
 
