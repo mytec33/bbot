@@ -94,6 +94,7 @@ frisk
 stout
 glide
 datum
+atlas
 ledge
 tiger
 spool
@@ -321,6 +322,7 @@ pesky
 kneel
 thorn
 squib
+squid
 rigor
 stork
 slimy
@@ -699,6 +701,7 @@ parka
 baker
 madly
 spank
+spate
 chess
 riser
 sneer
@@ -848,6 +851,7 @@ fresh
 molar
 motel
 grind
+indie
 prick
 ruler
 going
