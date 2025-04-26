@@ -9,42 +9,45 @@ namespace Wordlebot
 {
     internal class Program
     {
-        private static bool ResultOnly = false;
-        private static string StartingWord = "";
-        private static string Wordle = "";
-        private static string WordListFile = "";
         private static WordleWordList? WordList;
 
         static void Main(string[] args)
         {
-            var processedArgsResult = ProcessedArgs(args);
-            if (processedArgsResult != "")
-            {
-                PrintUsage(processedArgsResult);
-                Environment.Exit(Constants.EXIT_INVALID_ARGS);
-            }
-
-            string loggingLevel = "normal";
-            if (ResultOnly)
-            {
-                loggingLevel = "quiet";
-            }
-            var logger = new ConsoleLogger(loggingLevel);
-
             try
             {
-                WordList = new WordleWordList(WordListFile, logger);
+                var (processedArgsResult, error) = ProcessedArgs(args);
+                if (processedArgsResult == null)
+                {
+                    PrintUsage(error);
+                    Environment.Exit(Constants.EXIT_INVALID_ARGS);
+                }
+
+                string loggingLevel = "normal";
+                if (processedArgsResult.ResultOnly)
+                {
+                    loggingLevel = "quiet";
+                }
+                var logger = new ConsoleLogger(loggingLevel);
+
+                try
+                {
+                    WordList = new WordleWordList(processedArgsResult.WordListFile, logger);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return;
+                }
+
+                var game = new WordleGame(logger, WordList, processedArgsResult);
+                var result = game.PlayWordle();
+
+                Console.WriteLine(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return;
+                Console.WriteLine($"Error starting bbot: {ex.Message}");
             }
-
-            var game = new WordleGame(logger, WordList, StartingWord, Wordle, ResultOnly);
-            var result = game.PlayWordle();
-
-            Console.WriteLine(result);
         }
 
         static void PrintUsage(string result)
@@ -55,44 +58,55 @@ namespace Wordlebot
             Console.WriteLine("\tdotnet run [--result-only] --wordlist-file file --starting-word guess --wordle wordle");
         }
 
-        static string ProcessedArgs(string[] args)
+        static (ProgramArguments? args, string error) ProcessedArgs(string[] args)
         {
+            bool resultOnly = false;
+            string? startingWord = "";
+            string? wordle = "";
+            string? wordListFile = "";
+
             for (int x = 0; x < args.Length; x++)
             {
                 if (args[x] == "--result-only")
                 {
-                    ResultOnly = true;
+                    resultOnly = true;
                 }
                 else if (args[x] == "--starting-word")
                 {
-                    StartingWord = args[++x];
+                    startingWord = args[++x];
                 }
                 else if (args[x] == "--wordle")
                 {
-                    Wordle = args[++x];
+                    wordle = args[++x];
                 }
                 else if (args[x] == "--wordlist-file")
                 {
-                    WordListFile = args[++x];
+                    wordListFile = args[++x];
                 }
             }
 
-            if (StartingWord.Length != 5)
+            if (startingWord.Length != 5)
             {
-                return "Invalid starting word or no starting word provided: --starting-word some_five_letter_word";
+                throw new Exception("Invalid starting word or no starting word provided: --starting-word some_five_letter_word");
             }
 
-            if (Wordle.Length != 5)
+            if (wordle.Length != 5)
             {
-                return "Invalid Wordle word provide or no value provided: --wordle some_five_letter_word";
+                throw new Exception("Invalid Wordle word provide or no value provided: --wordle some_five_letter_word");
             }
 
-            if (WordListFile == "")
+            if (wordListFile == "")
             {
-                return "Wordlist file not provided: --wordlist-file location_to_file";
+                throw new Exception("Wordlist file not provided: --wordlist-file location_to_file");
             }
 
-            return "";
+            return (new ProgramArguments
+            {
+                ResultOnly = resultOnly,
+                StartingWord = startingWord,
+                Wordle = wordle,
+                WordListFile = wordListFile
+            }, "");
         }
     }
 }

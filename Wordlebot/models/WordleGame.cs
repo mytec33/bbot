@@ -12,12 +12,12 @@ namespace Wordlebot
         private ILogger Logger { get; init; }
         private readonly WordleWordList WordList;
 
-        public WordleGame(ILogger logger, WordleWordList wordList, string startingWord, string wordle, bool resultsOnly)
+        public WordleGame(ILogger logger, WordleWordList wordList, ProgramArguments args)
         {
             Logger = logger;
-            ResultOnly = resultsOnly;
-            FirstGuess = startingWord;
-            Wordle = wordle;
+            ResultOnly = args.ResultOnly;
+            FirstGuess = args.StartingWord;
+            Wordle = args.Wordle;
             WordList = wordList;
         }
 

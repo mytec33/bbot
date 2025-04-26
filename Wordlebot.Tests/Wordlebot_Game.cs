@@ -20,7 +20,15 @@ namespace Wordlebot.Tests
             string WordListFile = Path.Combine(projectDirectory, "Wordlebot", "5_letter_words_official.txt");
             var wordlist = new WordleWordList(WordListFile, logger);
 
-            var game = new WordleGame(logger, wordlist, startingWord, wordle, true);
+            var args = new ProgramArguments
+            {
+                ResultOnly = true,
+                StartingWord = startingWord,
+                Wordle = wordle,
+                WordListFile = ""
+            };
+
+            var game = new WordleGame(logger, wordlist, args);
             var result = game.PlayWordle();
 
             Assert.Equal(expected, result);
@@ -40,7 +48,15 @@ namespace Wordlebot.Tests
             string WordListFile = Path.Combine(projectDirectory, "Wordlebot", "5_letter_words_official.txt");
             var wordlist = new WordleWordList(WordListFile, logger);
 
-            var game = new WordleGame(logger, wordlist, startingWord, wordle, true);
+            var args = new ProgramArguments
+            {
+                ResultOnly = true,
+                StartingWord = startingWord,
+                Wordle = wordle,
+                WordListFile = ""
+            };
+
+            var game = new WordleGame(logger, wordlist, args);
             var result = game.PlayWordle();
 
             Assert.Equal(expected, result);
