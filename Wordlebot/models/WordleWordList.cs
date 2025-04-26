@@ -8,6 +8,11 @@ namespace Wordlebot
         {
             public char Letter;
             public int Frequency;
+
+            public override readonly string ToString()
+            {
+                return $"{Letter} {Frequency}";
+            }
         }
 
         private ILogger Logger { get; set; }
@@ -243,11 +248,23 @@ namespace Wordlebot
 
             frequentLetters = frequentLetters.OrderByDescending(x => x.Frequency).ToList();
 
+            Console.WriteLine("Letters and their frequency:");
+            foreach (var letter in frequentLetters.ToList())
+            {
+                Console.WriteLine($"\t{letter}");
+            }
+
             while (frequentLetters.Count > 0)
             {
                 Logger.WriteLine($"Looking for words with {frequentLetters.Count} of {frequentLetters.Count} matches");
                 alternateWords = CandidateWordsByFrequentLetters(frequentLetters, frequentLetters.Count);
- 
+
+                Console.WriteLine("Alternate words:");
+                foreach (string word in alternateWords)
+                {
+                    Console.WriteLine($"\t{word}");
+                }
+
                 if (alternateWords.Count > 0)
                 {
                     Logger.WriteLine($"Found {frequentLetters.Count} words with {frequentLetters.Count} letter matches");
