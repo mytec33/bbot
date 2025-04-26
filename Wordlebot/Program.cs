@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Mail;
 using Wordlebot;
 
 /*
@@ -15,15 +16,10 @@ namespace Wordlebot
         {
             try
             {
-                var (processedArgsResult, error) = ProcessedArgs(args);
-                if (processedArgsResult == null)
-                {
-                    PrintUsage(error);
-                    Environment.Exit(Constants.EXIT_INVALID_ARGS);
-                }
+                var processedArgs = ProcessArgs(args);
 
                 string loggingLevel = "normal";
-                if (processedArgsResult.ResultOnly)
+                if (processedArgs.ResultOnly)
                 {
                     loggingLevel = "quiet";
                 }
@@ -31,7 +27,7 @@ namespace Wordlebot
 
                 try
                 {
-                    WordList = new WordleWordList(processedArgsResult.WordListFile, logger);
+                    WordList = new WordleWordList(processedArgs.WordListFile, logger);
                 }
                 catch (Exception ex)
                 {
@@ -39,7 +35,7 @@ namespace Wordlebot
                     return;
                 }
 
-                var game = new WordleGame(logger, WordList, processedArgsResult);
+                var game = new WordleGame(logger, WordList, processedArgs);
                 var result = game.PlayWordle();
 
                 Console.WriteLine(result);
@@ -58,12 +54,29 @@ namespace Wordlebot
             Console.WriteLine("\tdotnet run [--result-only] --wordlist-file file --starting-word guess --wordle wordle");
         }
 
-        static (ProgramArguments? args, string error) ProcessedArgs(string[] args)
+        static string GetNextArg(string[] args, ref int x, string argName)
+        {
+            x++;
+            if (x >= args.Length)
+            {
+                throw new ArgumentException($"{argName} requires a value.");
+            }
+
+            var nextValue = args[x];
+            if (nextValue.StartsWith("--"))
+            {
+                throw new ArgumentException($"{argName} requires a value, but found another flag: {nextValue}");
+            }
+
+            return args[x];
+        }
+
+        static ProgramArguments ProcessArgs(string[] args)
         {
             bool resultOnly = false;
-            string? startingWord = "";
-            string? wordle = "";
-            string? wordListFile = "";
+            string startingWord = "";
+            string wordle = "";
+            string wordListFile = "";
 
             for (int x = 0; x < args.Length; x++)
             {
@@ -73,40 +86,45 @@ namespace Wordlebot
                 }
                 else if (args[x] == "--starting-word")
                 {
-                    startingWord = args[++x];
+                    startingWord = GetNextArg(args, ref x, "--starting-word");
                 }
                 else if (args[x] == "--wordle")
                 {
-                    wordle = args[++x];
+                    wordle = GetNextArg(args, ref x, "--wordle");
                 }
                 else if (args[x] == "--wordlist-file")
                 {
-                    wordListFile = args[++x];
+                    wordListFile = GetNextArg(args, ref x, "--wordlist-file");
+                }
+                else
+                {
+                    throw new ArgumentException($"Unknown arg: {args[x]}");
                 }
             }
 
+            // Required flags
             if (startingWord.Length != 5)
             {
-                throw new Exception("Invalid starting word or no starting word provided: --starting-word some_five_letter_word");
+                throw new ArgumentException("Invalid or missing starting word.\nUsage: --starting-word some_five_letter_word");
             }
 
             if (wordle.Length != 5)
             {
-                throw new Exception("Invalid Wordle word provide or no value provided: --wordle some_five_letter_word");
+                throw new ArgumentException("Invalid or missing Wordle word.\nUsage: --wordle some_five_letter_word");
             }
 
-            if (wordListFile == "")
+            if (string.IsNullOrEmpty(wordListFile))
             {
-                throw new Exception("Wordlist file not provided: --wordlist-file location_to_file");
+                throw new ArgumentException("Invalid or missing Wordlist file.\nUsage: --wordlist-file location_to_file");
             }
 
-            return (new ProgramArguments
+            return new ProgramArguments
             {
                 ResultOnly = resultOnly,
                 StartingWord = startingWord,
                 Wordle = wordle,
                 WordListFile = wordListFile
-            }, "");
+            };
         }
     }
 }
