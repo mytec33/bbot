@@ -43,15 +43,16 @@ namespace Wordlebot
             catch (Exception ex)
             {
                 Console.WriteLine($"Error starting bbot: {ex.Message}");
+                PrintUsage();
             }
         }
 
-        static void PrintUsage(string result)
+        static void PrintUsage()
         {
-            Console.WriteLine(result);
-
             Console.WriteLine("\nUsage:");
             Console.WriteLine("\tdotnet run [--result-only] --wordlist-file file --starting-word guess --wordle wordle");
+            Console.WriteLine("Example:");
+            Console.WriteLine("\tdotnet run --wordlist-file ./file.txt --starting-word arose --wordle clang");
         }
 
         static string GetNextArg(string[] args, ref int x, string argName)
