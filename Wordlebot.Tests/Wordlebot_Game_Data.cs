@@ -97,6 +97,7 @@ namespace Wordlebot.Tests
             Add("arose", "froze", "5 tries");
             Add("arose", "whale", "3 tries");
             Add("arose", "hobby", "5 tries");
+            Add("arose", "clash", "2 tries");
         }
     }
 
@@ -297,6 +298,14 @@ namespace Wordlebot.Tests
             Add("magic", "froze", "6 tries");
             Add("magic", "whale", "4 tries");
             Add("magic", "hobby", "5 tries");
+        }
+    }
+
+    public class VersusWordleBot : TheoryData<string, string, string, string>
+    {
+        public VersusWordleBot()
+        {
+            Add("plate", "clash", "3 tries", "3 tries");
         }
     }
 }
