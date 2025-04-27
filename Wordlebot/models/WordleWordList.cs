@@ -204,6 +204,18 @@ namespace Wordlebot
                 {
                     throw new WordListReadingException("No data found in file.", new WordListReadingException(""));
                 }
+
+                foreach (string word in list)
+                {
+                    if (word.Length != 5)
+                    {
+                        throw new WordListReadingException($"word not equal to 5 characters: {word}");
+                    }
+                }
+            }
+            catch (WordListReadingException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
